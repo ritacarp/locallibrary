@@ -1,0 +1,27 @@
+extends layout
+
+block content
+
+    block content
+
+    h1= title
+
+    table(border='1', width="100%")
+        tr
+            th(width="20%") Genre
+            th Title
+
+        each oneGenre in genre_list
+            tr 
+                td 
+                    a(href=oneGenre.genre.url) #{oneGenre.genre.name} 
+                td 
+                    each oneBook in oneGenre.books
+                        div  
+                            a(href=oneBook.url) #{oneBook.title} 
+                            a(href=oneBook.author.url) (#{oneBook.author.name})
+                    else
+                        div There are no books in this genre
+        else
+            tr
+            td There are no genres

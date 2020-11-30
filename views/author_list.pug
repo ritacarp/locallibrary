@@ -1,0 +1,32 @@
+extends layout
+
+block content
+
+  h1= title
+  
+  table(style='width:70%', border='0', cellpadding='5' cellspacing='0')
+    tr
+      th Name
+      th Date of Birth
+      th Date of Death
+      th Age
+      
+      each author in author_list
+        tr
+          td 
+            a(href=author.url) #{author.name}
+          if author.date_of_birth!=null  
+            td #{moment(author.date_of_birth).format('LL')}
+          else
+            td &nbsp;
+          if author.date_of_death!=null
+            td #{moment(author.date_of_death).format('LL')}
+          else
+            td &nbsp;
+          td #{author.lifespan}
+      else
+        tr
+          td There are no authors.
+
+          
+  
