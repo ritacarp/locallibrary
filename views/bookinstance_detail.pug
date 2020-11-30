@@ -1,0 +1,22 @@
+extends layout
+
+block content
+
+    h2 ID: #{instance._id}
+    
+    p <span style="font-weight:bold">Title: </span> 
+        a(href=instance.book.url) #{instance.book.title}
+
+    p <span style="font-weight:bold">Imprint: </span> #{instance.imprint}
+
+    p <span style="font-weight:bold">Status: </span>
+        if instance.status=='Available'
+          span.text-success #{instance.status}
+        else if instance.status=='Maintenance'
+          span.text-danger #{instance.status}
+        else
+          span.text-warning #{instance.status}
+        
+    p
+        if instance.status!='Available'
+          <span style="font-weight:bold">Due back: </span> #{instance.due_back_formatted}

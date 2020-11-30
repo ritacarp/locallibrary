@@ -1,0 +1,26 @@
+extends layout
+
+block content
+
+    h2 Author: #{author.name}
+
+    if author.date_of_birth
+        span #{author.date_of_birth_formatted}  
+        if author.date_of_death 
+            span  - #{author.date_of_death_formatted}
+    
+    div(style='margin-left:20px;margin-top:20px')
+
+        h4 Books
+
+        dl
+            each book in author_books
+                dt 
+                    a(href=book.url) #{book.title} 
+                    //-
+                        a(href=book.author.url) #{book.author.name} 
+                    //-
+                        | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
+                dd #{book.summary} 
+            else
+                dt There are no books written by this author
