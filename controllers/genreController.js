@@ -11,7 +11,7 @@ exports.genre_list = async function(req, res,next) {
     let allGenres=[]
     
     try {
-        genres = await aGenre.find({}).sort([['name', 'ascending']])
+        genres = await Genre.find({}).sort([['name', 'ascending']])
         for (let i = 0; i < genres.length; i++) {
             books = await Book.find({ 'genre': genres[i]._id }, {title:1, author:1})
             .sort([['title', 'ascending']])
