@@ -7,9 +7,9 @@ var async = require('async');
 exports.genre_list = async function(req, res,next) {
     //res.send('NOT IMPLEMENTED: Genre list');
     let genres
-    
+
     let allGenres=[]
-    
+
     try {
         genres = await Genre.find({}).sort([['name', 'ascending']])
         for (let i = 0; i < genres.length; i++) {
@@ -28,11 +28,11 @@ exports.genre_list = async function(req, res,next) {
 
     console.log(allGenres)
     res.render('genre_list', { title: 'Genre List', genre_list: allGenres });
-    
 
 
 
- 
+
+
     /*
     Genre.find({})
     .sort([['name', 'ascending']])

@@ -19,9 +19,16 @@ var catalogRouter = require('./routes/catalog');  //Import routes for "catalog" 
 var app = express();
 app.locals.moment = require('moment');
 
+const port = process.env.PORT
+const nodeEnv = process.env.NODE_ENV
+const libraryConnectString = process.env.LIBRARY_DB_URI
+
+
 //Set up mongoose connection
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb+srv://m001-student:m001-mongodb-basics@sandbox.pagxe.mongodb.net/local_library?retryWrites=true&w=majority';
+//var mongoDB = 'mongodb+srv://m001-student:m001-mongodb-basics@sandbox.pagxe.mongodb.net/local_library?retryWrites=true&w=majority';
+
+var mongoDB = process.env.LIBRARY_DB_URI
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
@@ -57,7 +64,8 @@ app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   console.log("In app.use, env = " + req.app.get('env'))
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  //res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.error = process.env.NODE_ENV === 'development' ? err : {};
 
   // render the error page
   res.status(err.status || 500);
