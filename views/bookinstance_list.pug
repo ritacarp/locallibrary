@@ -9,7 +9,7 @@ block content
     - instances.sort(function(a, b) {let textA = a.book.title.toUpperCase(); let textB = b.book.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
     each instance in instances
     
-      li
+      li(style="padding-bottom:10px")
         a(href=instance.url) #{instance.book.title} 
         | by 
         a(href=instance.book.author.url) (#{instance.book.author.name})
@@ -20,6 +20,7 @@ block content
           span.text-danger #{instance.status}
         else
           span.text-warning #{instance.status}
+        br
         if instance.status!='Available'
           span  (Due: #{instance.due_back_formatted} )
     else

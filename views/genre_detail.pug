@@ -15,4 +15,6 @@ block content
                     | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
             dd #{book.summary}
         else
-            dt There are no books in this genre
+            dd 
+                div There are no books in this genre
+                span Click <a style="font-weight:bold" href="/catalog/author/create">here</a> to add an author to this genre

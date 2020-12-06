@@ -1,0 +1,84 @@
+extends layout
+
+
+block content
+
+    h1 #{title}
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='first_name') #[strong First Name:] 
+            input#first_name(class="form-control" type='text', placeholder='First Name' name='first_name' required='true'  value=(undefined===author ? '' : author.first_name))
+
+    
+        div.form-group
+            label(for='family_name') #[strong Last Name:] 
+            input#family_name(class="form-control" type='text', placeholder='Last Name (surname)'  name='family_name' required='true'  value=(undefined===author ? '' : author.family_name))
+
+        //-
+            div.form-group
+                label(for='date_of_death') #[strong Date of death:]
+                input#date_of_birth(type='text' class="form-control" name='date_of_birth' value=(undefined===author ? '' : author.date_of_birth))
+
+
+            div.form-group
+                label(for='date_of_death') #[strong Date of death:] 
+                input#date_of_death(type='text' class="form-control" name='date_of_death' value=(undefined===author ? '' : author.date_of_death))
+        table(width="100%") 
+            tr
+                th(width="48%") Date of birth 
+                th(width="4%") &nbsp;
+                th(width="48%") Date of death 
+            tr
+                th
+                    div.form-group
+                        div(class="input-group date"  id="date_of_birth_dp")
+                            input#date_of_birth(type='text' class="form-control dp" name='date_of_birth' value=(undefined===author ? '' : author.date_of_birth))
+                            span(class="input-group-addon  input-group-append")
+                                div(class="input-group-text")
+                                    i(class="glyphicon glyphicon-calendar fa fa-calendar")
+
+                th
+                    span &nbsp;
+
+                th
+                    div.form-group
+                        div(class="input-group date"  id="date_of_death_dp")
+                            input#date_of_death(type='text' class="form-control dp" name='date_of_death' value=(undefined===author ? '' : author.date_of_death))
+                            span(class="input-group-addon  input-group-append")
+                                div(class="input-group-text")
+                                    i(class="glyphicon glyphicon-calendar fa fa-calendar")
+
+        //-
+            div.form-group
+                label(for='date_of_birth') #[strong Date of birth:]
+                div(class="input-group date"  id="date_of_birth_dp")
+                    input#date_of_birth(type='text' readonly class="form-control dp" name='date_of_birth' value=(undefined===author ? '' : author.date_of_birth))
+                    span(class="input-group-addon  input-group-append")
+                        div(class="input-group-text")
+                            i(class="glyphicon glyphicon-calendar fa fa-calendar")
+    
+            div.form-group
+                label(for='date_of_death') #[strong Date of death:]
+                div(class="input-group date"  id="date_of_death_dp")
+                    input#date_of_death(type='text' readonly class="form-control dp" name='date_of_death' value=(undefined===author ? '' : author.date_of_death))
+                    span(class="input-group-addon  input-group-append")
+                        div(class="input-group-text")
+                            i(class="glyphicon glyphicon-calendar fa fa-calendar")
+ 
+       
+
+
+
+        button(class="btn btn-primary" type='submit') Submit
+
+        if errors 
+            ul
+                for error in errors
+                    li!= error.msg
+
+
+    link(id="bsdp-css" href="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet")
+    script(src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js") 
+
+    script(type="text/javascript" src="/javascripts/myDatePicker.js")
