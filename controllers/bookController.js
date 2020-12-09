@@ -77,7 +77,49 @@ exports.book_detail = function(req, res) {
 
 // Display book create form on GET.
 exports.book_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
+    //res.send('NOT IMPLEMENTED: Book create GET');
+
+    async.parallel({
+        authors: function(callback) {
+            Author.find({}).sort( { family_name: 1, first_name:1 } )
+              .exec(callback);
+        },
+        genres: function(callback) {
+            Genre.find({ }).sort({name:1})
+              .exec(callback);
+        },
+    },
+
+    function(err, results) {
+        if (err) { return next(err); }
+        var errorMessage = ""
+        if (results.authors==null || results.genres==null) { // No results.
+            {
+                if (results.authors==null) {
+                    errorMessage = errorMessage + "No authors found"
+                }
+                if (results.genres==null) {
+                    if (errorMessage) {
+                        errorMessage = errorMessage + "; "
+                    }
+                    errorMessage = errorMessage + "No genres found"
+                }
+            var err = new Error(errorMessage);
+            err.status = 404;
+            return next(err);
+            }
+        }
+
+        // Successful, so render
+        res.render('book_form', { title: 'Create Book', authors: results.authors, gemres: results.genres } );
+    });    
+
+
+
+
+
+
+
 };
 
 // Handle book create on POST.

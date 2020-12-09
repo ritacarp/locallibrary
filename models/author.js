@@ -60,6 +60,30 @@ AuthorSchema
   else return ""
 });
 
+
+AuthorSchema
+.virtual('date_of_birth_short')
+.get(function () {
+  if (this.date_of_birth) {
+    return DateTime.fromJSDate(this.date_of_birth).toLocaleString(DateTime.DATE_SHORT);
+  }
+  else return ""
+});
+
+
+AuthorSchema
+.virtual('date_of_death_short')
+.get(function () {
+  if (this.date_of_death) {
+    return DateTime.fromJSDate(this.date_of_death).toLocaleString(DateTime.DATE_SHORT);
+  }
+  else return ""
+});
+
+
+
+
+
 const Author = mongoose.model('Author',AuthorSchema)
 module.exports = Author
 

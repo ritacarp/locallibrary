@@ -1,0 +1,14 @@
+extends layout
+
+
+block content
+
+    h1 #{title}
+
+    form(method='POST' action='')
+
+        div.form-group
+            label(for='title') #[strong Title:] 
+            input#title(class="form-control" type='text', placeholder='Title' name='title' required='true'  value=(undefined===book ? '' : book.title))
+
+        button(class="btn btn-primary" type='submit') Submit

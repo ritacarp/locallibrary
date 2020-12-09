@@ -6,6 +6,11 @@ block content
     h1 #{title}
 
     form(method='POST' action='')
+
+        
+
+        input#_id(type='hidden' name='_id' value=(undefined===author ? '' : author._id))
+
         div.form-group
             label(for='first_name') #[strong First Name:] 
             input#first_name(class="form-control" type='text', placeholder='First Name' name='first_name' required='true'  value=(undefined===author ? '' : author.first_name))
@@ -24,6 +29,7 @@ block content
             div.form-group
                 label(for='date_of_death') #[strong Date of death:] 
                 input#date_of_death(type='text' class="form-control" name='date_of_death' value=(undefined===author ? '' : author.date_of_death))
+        
         table(width="100%") 
             tr
                 th(width="48%") Date of birth 
@@ -33,7 +39,7 @@ block content
                 th
                     div.form-group
                         div(class="input-group date"  id="date_of_birth_dp")
-                            input#date_of_birth(type='text' class="form-control dp" name='date_of_birth' value=(undefined===author ? '' : author.date_of_birth))
+                            input#date_of_birth(type='text' class="form-control dp" name='date_of_birth' value=(undefined===author ? '' : author.date_of_birth_short))
                             span(class="input-group-addon  input-group-append")
                                 div(class="input-group-text")
                                     i(class="glyphicon glyphicon-calendar fa fa-calendar")
@@ -44,7 +50,7 @@ block content
                 th
                     div.form-group
                         div(class="input-group date"  id="date_of_death_dp")
-                            input#date_of_death(type='text' class="form-control dp" name='date_of_death' value=(undefined===author ? '' : author.date_of_death))
+                            input#date_of_death(type='text' class="form-control dp" name='date_of_death' value=(undefined===author ? '' : author.date_of_death_short))
                             span(class="input-group-addon  input-group-append")
                                 div(class="input-group-text")
                                     i(class="glyphicon glyphicon-calendar fa fa-calendar")
