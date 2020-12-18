@@ -2,19 +2,32 @@ extends layout
 
 block content
 
-    h1= title
+ 
+    h2
+        span Genre: #{genre.name}
+        span &nbsp;&nbsp;
+        button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/genre/" data-action="/update" data-ID=genre._id) Edit
 
-    h2=genre.name
+    div(style='margin-left:20px;margin-top:20px')
 
-    dl
-        each book in genre_books
-            dt 
-                a(href=book.url) #{book.title} 
-                a(href=book.author.url) #{book.author.name} 
-                //-
-                    | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
-            dd #{book.summary}
-        else
-            dd 
-                div There are no books in this genre
-                span Click <a style="font-weight:bold" href="/catalog/author/create">here</a> to add an author to this genre
+        - var qStr = 'genreID=' + genre._id
+        h4 
+            span Books
+            span &nbsp;&nbsp;
+            button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book" data-action="/create" data-qs=qStr) Add A Book
+
+
+        dl
+            each book in genre_books
+                dt 
+                    a(href=book.url) #{book.title} 
+                    a(href=book.author.url) #{book.author.name} 
+                    //-
+                        | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
+                dd #{book.summary}
+            else
+                dd 
+                    div There are no books in this genre
+                    span Click <a style="font-weight:bold" href="/catalog/author/create">here</a> to add an author to this genre
+
+    script(type="text/javascript" src="/javascripts/authorList.js")

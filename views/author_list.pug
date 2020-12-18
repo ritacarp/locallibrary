@@ -2,31 +2,39 @@ extends layout
 
 block content
 
-  h1= title
+  h2= title
   
-  table(style='width:70%', border='0', cellpadding='5' cellspacing='0')
-    tr
-      th Name
-      th Date of Birth
-      th Date of Death
-      th Age
+  table(style='width:90%'  class="table table-hover table-sm")
+    thead(class="thead-dark")
+      tr
+        th(width="42%") Name
+        th(width="20%") Date of Birth
+        th(width="20%") Date of Death
+        th Age
+        th 
+          <a href="/catalog/author/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
       
-      each author in author_list
-        tr
-          td 
-            a(href=author.url) #{author.name}
-          if author.date_of_birth!=null  
-            td #{moment(author.date_of_birth).format('LL')}
-          else
-            td &nbsp;
-          if author.date_of_death!=null
-            td #{moment(author.date_of_death).format('LL')}
-          else
-            td &nbsp;
-          td #{author.lifespan}
-      else
-        tr
-          td There are no authors.
+      tbody
+        each author in author_list
+          tr
+            td 
+              a(href=author.url) #{author.name}
+            if author.date_of_birth!=null  
+              td #{moment(author.date_of_birth).format('LL')}
+            else
+              td &nbsp;
+            if author.date_of_death!=null
+              td #{moment(author.date_of_death).format('LL')}
+            else
+              td &nbsp;
+            td #{author.lifespan}
+            td 
+              //-
+                button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="" data-ID=author._id) View
+                span &nbsp;&nbsp;
+              button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="/update" data-ID=author._id) Edit Author
+        else
+          tr
+            td There are no authors.
 
-          
-  
+  script(type="text/javascript" src="/javascripts/authorList.js")

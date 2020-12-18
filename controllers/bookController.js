@@ -4,11 +4,23 @@ var Book = require('../models/book');
 var Author = require('../models/author');
 var Genre = require('../models/genre');
 var BookInstance = require('../models/bookinstance');
+var async = require('async');
+const { body, validationResult, check, matchedData, params } = require("express-validator");
+var mongoose = require('mongoose');
 
 var async = require('async');
 
 
-exports.index = function(req, res) {
+
+
+
+
+
+
+
+
+
+exports.index = function(req, res, next) {
     async.parallel({
         book_count: function(callback) {
             Book.countDocuments({}, callback); // Pass an empty object as match condition to find all documents of this collection
@@ -33,7 +45,7 @@ exports.index = function(req, res) {
 
 
 // Display list of all books.
-exports.book_list = function(req, res) {
+exports.book_list = function(req, res, next) {
     Book.find({}, 'title author')
     .populate('author')
     .exec(function (err, list_books) {
@@ -44,7 +56,7 @@ exports.book_list = function(req, res) {
 };
 
 // Display detail page for a specific book.
-exports.book_detail = function(req, res) {
+exports.book_detail = function(req, res, next) {
     //res.send('NOT IMPLEMENTED: Book detail: ' + req.params.id);
     async.parallel({
         book: function(callback) {
@@ -55,9 +67,8 @@ exports.book_detail = function(req, res) {
               .exec(callback);
         },
         book_instance: function(callback) {
-
-          BookInstance.find({ 'book': req.params.id })
-          .exec(callback);
+            BookInstance.find({ 'book': req.params.id })
+            .exec(callback);
         },
     }, function(err, results) {
         if (err) { return next(err); }
@@ -66,6 +77,8 @@ exports.book_detail = function(req, res) {
             err.status = 404;
             return next(err);
         }
+
+        //console.log("\n\nbook_detail: book = " + results.book)
         // Successful, so render.
         res.render('book_detail', { book: results.book, book_instances: results.book_instance } );
     });
@@ -75,8 +88,9 @@ exports.book_detail = function(req, res) {
 
 };
 
+
 // Display book create form on GET.
-exports.book_create_get = function(req, res) {
+exports.book_create_get = function(req, res, next) {
     //res.send('NOT IMPLEMENTED: Book create GET');
 
     async.parallel({
@@ -85,64 +99,354 @@ exports.book_create_get = function(req, res) {
               .exec(callback);
         },
         genres: function(callback) {
-            Genre.find({ }).sort({name:1})
+            Genre.find({}).sort({name:1})
               .exec(callback);
         },
     },
 
+
     function(err, results) {
         if (err) { return next(err); }
-        var errorMessage = ""
-        if (results.authors==null || results.genres==null) { // No results.
-            {
-                if (results.authors==null) {
-                    errorMessage = errorMessage + "No authors found"
-                }
-                if (results.genres==null) {
-                    if (errorMessage) {
-                        errorMessage = errorMessage + "; "
-                    }
-                    errorMessage = errorMessage + "No genres found"
-                }
-            var err = new Error(errorMessage);
-            err.status = 404;
-            return next(err);
-            }
-        }
+        let authorIDs=""
+        if (req.query.authorID) { authorIDs=req.query.authorID}
 
+        let genreIDs=""
+        if (req.query.genreID) { genreIDs=req.query.genreID}
+        
+ 
         // Successful, so render
-        res.render('book_form', { title: 'Create Book', authors: results.authors, gemres: results.genres } );
+        res.render('book_form', { title: 'Create Book', authors: results.authors, genres: results.genres, authorIDs:authorIDs, genreIDs:genreIDs } );
     });    
 
 
-
-
-
-
-
 };
+
+
+
+
+function findBook(req, res, next, book, authorIDs, genreIDs, results, titleAndAuthorQuery, isbnQuery, title, id) {
+    // Data from form is valid. See if we can find a book with the selected author and same title
+
+    // Data from form is valid. See if we can find a book with the selected author and same title
+    console.log("\n\n1) In book_create_post: searching for title and author\n\n")
+    console.log("\n\n1) title = " + req.body.title + "; author = " + allAuthors + "\n\n")
+
+
+    //Book.findOne({ 'title': req.body.title})
+    Book.findOne(titleAndAuthorQuery)
+    .exec( function(err, found_titleAndAuthor) {
+        if (err) { return next(err); }
+        if (found_titleAndAuthor) {
+            console.log("\n\nIn book_post: FOUND title and author\n\n")
+            
+
+            duplicate="titleAndAuthor"
+            //duplicateID = found_titleAndAuthor._id
+            duplicateBookURL = found_titleAndAuthor.url
+            res.render('book_form', { title:title, authors:results.authors, genres:results.genres, book: book, authorIDs:authorIDs, genreIDs:genreIDs, sendDuplicateAlert:1, duplicate:duplicate ,duplicateBookURL:duplicateBookURL } );
+        } else {
+
+            Book.findOne(isbnQuery)
+            .exec( function(err, found_isbn) {
+                if (err) { return next(err); }
+                if (found_isbn) {
+                    duplicate="ISBN"
+                    //duplicateID = found_isbn._id
+                    duplicateBookURL = found_isbn.url
+                    res.render('book_form', { title:title, authors:results.authors, genres:results.genres, book: book,  authorIDs:authorIDs, genreIDs:genreIDs, sendDuplicateAlert:1, duplicate:duplicate ,duplicateBookURL:duplicateBookURL } );
+                }
+                else {
+                    if (!id) {
+                        book.save(function (err) {
+                            if (err) { return next(err); }
+                            //successful - redirect to new book record.
+                            res.redirect(book.url);
+                            });
+                    }  else {
+
+                        Book.findByIdAndUpdate(req.params.id, book, {}, function (err,found_book) {
+                            if (err) { return next(err); }
+                                // Author saved. Redirect to Author detail page.
+                                if (found_book == null) {
+                
+                                    delete book._id
+                                    // Save the book
+                                    book.save(function (err) {
+                                    if (err) { return next(err); }
+                                    // Book saved. Redirect to Book detail page.
+                                    res.redirect(book.url);
+                                  });
+                                } else {
+                                    res.redirect(book.url);
+                                }
+                                
+                
+                            });  // Author.findByIdAndUpdate
+                
+                    } 
+                }
+            })
+
+
+
+        }  // else
+    })  // Book.findOne({ 'title'
+
+
+}
+
+
+
 
 // Handle book create on POST.
-exports.book_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
-};
+exports.book_create_post = function(req, res, next) {
+    // Extract the validation errors from a request.
+    async.parallel({
+        authors: function(callback) {
+            Author.find(callback);
+        },
+
+        genres: function(callback) {
+            Genre.find({}).sort({name:1})
+              .exec(callback);
+        },
+
+
+    }, 
+    function(err, results) {
+        if (err) { return next(err); }
+    
+        const errors = validationResult(req);
+    
+        let authorIDs=""
+        //console.log("\n\n1)  in authors post: req.body.authorIDs=" + req.body.authorIDs + "; length = " + req.body.authorIDs.length)
+    
+        allAuthors = req.body.authorIDs.split(",")
+        //console.log("\n\n2)book_create_post:  allAuthors = " + allAuthors + "; allAuthors.length = " + allAuthors.length)
+    
+        let genreIDs=""
+        //console.log("\n\n1)  in authors post: req.body.genreIDs=" + req.body.genreIDs + "; length = " + req.body.genreIDs.length)
+    
+        allGenres = req.body.genreIDs.split(",")
+        //console.log("\n\n2)book_create_post:  allGenres = " + allGenres + "; allGenres.length = " + allGenres.length)
+    
+        
+    
+        // Create a Book object with escaped and trimmed data.
+        var book = new Book(
+        { title: req.body.title,
+          author: allAuthors,
+          summary: req.body.summary,
+          isbn: req.body.isbn,
+          genre: allGenres,
+        });
+    
+    
+        if (req.body.authorIDs) {
+            authorIDs = req.body.authorIDs
+        }
+    
+        if (req.body.genreIDs) {
+            genreIDs = req.body.genreIDs
+        }
+    
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array(), authorIDs:authorIDs, genreIDs:genreIDs  } );
+    
+            // Get all authors and genres for form.
+        } else {
+            // Data from form is valid. See if we can find a book with the selected author and same title
+
+            // Data from form is valid. See if we can find a book with the selected author and same title
+            console.log("\n\n1) In book_create_post: searching for title and author\n\n")
+            console.log("\n\n1) title = " + req.body.title + "; author = " + allAuthors + "\n\n")
+    
+    
+            //Book.findOne({ 'title': req.body.title})
+            let titleAndAuthorQuery = { 'title': req.body.title, 'author': { $in: allAuthors} }
+            let isbnQuery = { 'isbn': req.body.isbn }
+            findBook(req, res, next, book, authorIDs, genreIDs, results, titleAndAuthorQuery, isbnQuery, "Create Book", null )
+
+            /*
+            Book.findOne({ 'title': req.body.title, 'author': { $in: allAuthors} })
+            .exec( function(err, found_titleAndAuthor) {
+                if (err) { return next(err); }
+                if (found_titleAndAuthor) {
+                    console.log("\n\nIn book_create_post: FOUND title and author\n\n")
+                    
+    
+                    duplicate="titleAndAuthor"
+                    //duplicateID = found_titleAndAuthor._id
+                    duplicateBookURL = found_titleAndAuthor.url
+                    res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array(), authorIDs:authorIDs, genreIDs:genreIDs, sendDuplicateAlert:1, duplicate:duplicate ,duplicateBookURL:duplicateBookURL } );
+                } else {
+    
+                    Book.findOne({ 'isbn': req.body.isbn })
+                    .exec( function(err, found_isbn) {
+                        if (err) { return next(err); }
+                        if (found_isbn) {
+                            duplicate="ISBN"
+                            //duplicateID = found_isbn._id
+                            duplicateBookURL = found_isbn.url
+                            res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array(), authorIDs:authorIDs, genreIDs:genreIDs, sendDuplicateAlert:1, duplicate:duplicate ,duplicateBookURL:duplicateBookURL } );
+                        }
+                        else {
+                            book.save(function (err) {
+                                if (err) { return next(err); }
+                                //successful - redirect to new book record.
+                                res.redirect(book.url);
+                                });
+                        }
+                    })
+    
+    
+    
+                }  // else
+            })  // Book.findOne({ 'title'
+            */
+
+
+
+
+
+        }
+
+
+
+    });  // function(err, results)
+
+
+    };  // exports.book_create_post
+
+
+
+
+
 
 // Display book delete form on GET.
-exports.book_delete_get = function(req, res) {
+exports.book_delete_get = function(req, res, next) {
     res.send('NOT IMPLEMENTED: Book delete GET');
 };
 
 // Handle book delete on POST.
-exports.book_delete_post = function(req, res) {
+exports.book_delete_post = function(req, res, next) {
     res.send('NOT IMPLEMENTED: Book delete POST');
 };
 
 // Display book update form on GET.
-exports.book_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update GET');
-};
+exports.book_update_get = function(req, res, next) {
+    //res.send('NOT IMPLEMENTED: Book update GET');
+   //res.send('NOT IMPLEMENTED: Author update GET');
+   console.log("Edit Author: GET - Empty form\n")
+
+    async.parallel({
+        authors: function(callback) {
+            Author.find(callback);
+        },
+
+        genres: function(callback) {
+            Genre.find({}).sort({name:1})
+            .exec(callback);
+        },
+
+
+    }, 
+    function(err, results) {
+        if (err) { return next(err); }
+
+        Book.findById(req.params.id)
+        .exec(function (err, book) {
+            if (err) { 
+                console.log("Edit Book: GET - could not find author by id " + req.params.id + "\n")
+                return next(err); 
+            }
+            //Successful, so render
+            if (!book) {
+                res.redirect("/catalog/book/create")
+            }
+            res.render('book_form', { title: 'Edit  Book',authors:results.authors, genres:results.genres, book: book, authorIDs:book.author, genreIDs:book.genre  } );
+            
+          });
+ 
+    });  // async.parallel
+
+}; // exports.book_update_get 
 
 // Handle book update on POST.
-exports.book_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update POST');
-};
+exports.book_update_post = function(req, res, next) {
+    //res.send('NOT IMPLEMENTED: Book update POST');
+
+    async.parallel({
+        authors: function(callback) {
+            Author.find(callback);
+        },
+
+        genres: function(callback) {
+            Genre.find({}).sort({name:1})
+              .exec(callback);
+        },
+
+
+    }, 
+    function(err, results) {
+
+        if (err) { return next(err); }
+    
+        const errors = validationResult(req);
+    
+        let authorIDs=""
+        //console.log("\n\n1)  in authors post: req.body.authorIDs=" + req.body.authorIDs + "; length = " + req.body.authorIDs.length)
+    
+        allAuthors = req.body.authorIDs.split(",")
+        //console.log("\n\n2)book_create_post:  allAuthors = " + allAuthors + "; allAuthors.length = " + allAuthors.length)
+    
+        let genreIDs=""
+        //console.log("\n\n1)  in authors post: req.body.genreIDs=" + req.body.genreIDs + "; length = " + req.body.genreIDs.length)
+    
+        allGenres = req.body.genreIDs.split(",")
+        //console.log("\n\n2)book_create_post:  allGenres = " + allGenres + "; allGenres.length = " + allGenres.length)
+    
+        
+    
+        // Create a Book object with escaped and trimmed data.
+        var book = new Book(
+        { title: req.body.title,
+          author: allAuthors,
+          summary: req.body.summary,
+          isbn: req.body.isbn,
+          genre: allGenres,
+          _id:req.params.id
+        });
+    
+    
+        if (req.body.authorIDs) {
+            authorIDs = req.body.authorIDs
+        }
+    
+        if (req.body.genreIDs) {
+            genreIDs = req.body.genreIDs
+        }
+    
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            res.render('book_form', { title: 'Update Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array(), authorIDs:authorIDs, genreIDs:genreIDs  } );
+    
+            // Get all authors and genres for form.
+        } else {
+
+            console.log("\n\n1) In book_update_post: searching for title and author\n\n")
+            console.log("\n\n1) title = " + req.body.title + "; author = " + allAuthors + "\n\n")
+    
+    
+            //Book.findOne({ 'title': req.body.title})
+            let titleAndAuthorQuery = { 'title': req.body.title, 'author': { $in: allAuthors}, "_id": {$ne: req.params.id} }
+            let isbnQuery = { 'isbn': req.body.isbn, "_id": {$ne: req.params.id} }
+            findBook(req, res, next, book, authorIDs, genreIDs, results, titleAndAuthorQuery, isbnQuery, "Update Book", req.params.id )
+
+        }
+
+    }); // function(err, results) 
+
+
+};  // exports.book_update_post

@@ -2,53 +2,45 @@ extends layout
 
 block content
 
-  h1= title
-  
-  
-  ul
-    - instances.sort(function(a, b) {let textA = a.book.title.toUpperCase(); let textB = b.book.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
-    each instance in instances
-    
-      li(style="padding-bottom:10px")
-        a(href=instance.url) #{instance.book.title} 
-        | by 
-        a(href=instance.book.author.url) (#{instance.book.author.name})
-        | &nbsp;
-        if instance.status=='Available'
-          span.text-success #{instance.status}
-        else if instance.status=='Maintenance'
-          span.text-danger #{instance.status}
-        else
-          span.text-warning #{instance.status}
-        br
-        if instance.status!='Available'
-          span  (Due: #{instance.due_back_formatted} )
-    else
-       No books available
-       
-  <table cellpadding="5" cellspacing="0" border="1">
-    <tr>
-      <td>Title</td>
-      <td>Author</td>
-      <td>Status</td>
-      <td>Due</td>
-    </tr>
-    
-     each instance in instances
-       tr
-       td <a href= #{instance.url}> #{instance.book.title}</a>
-       td <a href= #{instance.book.author.url}> #{instance.book.author.name}</a>
-       td
-               if instance.status=='Available'
-                 span.text-success #{instance.status}
-               else if instance.status=='Maintenance'
-                 span.text-danger #{instance.status}
-               else
-                 span.text-warning #{instance.status}
-       
-       td 
-               if instance.status!='Available'
-                 span  #{moment(instance.due_back).format('YYYY-MM-DD')}
+  h2= title
 
- 
-  </table>
+  table(style='width:90%'  class="table table-hover table-sm")
+    thead(class="thead-dark")
+      tr
+        th(width="60%") Name
+        th Status
+        th
+          <a href="/catalog/bookinstance/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
+
+      tbody
+        - instances.sort(function(a, b) {let textA = a.book.title.toUpperCase(); let textB = b.book.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        each instance in instances
+          tr
+            td
+              a(href=instance.url) #{instance.book.decodedTitle} 
+              br
+              each val, idx in instance.book.author
+                span by 
+                a(href=val.url) #{val.first_name} #{val.family_name}
+                  if idx < (val.length - 1)
+                    br
+                |&nbsp;
+          
+            td
+
+              if instance.status=='Available'
+                span.text-success #{instance.status}
+              else if instance.status=='Maintenance'
+                span.text-danger #{instance.status}
+              else
+                span.text-warning #{instance.status}
+              if instance.status!='Available'
+                div  (Due: #{instance.due_back_formatted} )
+
+            td
+              button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/update" data-ID=instance._id) Edit Book Copy
+        else
+          No books available
+
+  script(type="text/javascript" src="/javascripts/authorList.js")
+       

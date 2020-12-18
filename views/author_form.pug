@@ -3,13 +3,15 @@ extends layout
 
 block content
 
-    h1 #{title}
+    h2 #{title}
 
     form(method='POST' action='')
 
         
 
         input#_id(type='hidden' name='_id' value=(undefined===author ? '' : author._id))
+        input#createDupe(type='hidden' name='createDupe' value=(undefined===createDupe ? '0' : createDupe))
+        input#sendDuplicateAlert(type='hidden' name='sendDuplicateAlert' value=(undefined===sendDuplicateAlert ? '0' : createDupe))
 
         div.form-group
             label(for='first_name') #[strong First Name:] 
@@ -75,8 +77,24 @@ block content
        
 
 
+        if sendDuplicateAlert == 0
+            button(class="btn btn-primary" type='submit') Submit
+        else
+            span Author 
+                a(href=author.url) #{author.first_name} #{author.family_name} 
+                already exists.
+            
+            - var editButtonLabel = "Edit "  + author.first_name + ' ' + author.family_name
+            - var saveButtonLabel = "Save duplicate "  + author.first_name + ' ' + author.family_name
+            br
+            button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="/update" data-ID=author._id) #{editButtonLabel}
+            span &nbsp; &nbsp;
+            button#saveDuplicate(type="button" class="btn btn-outline-primary btn-sm" ) #{saveButtonLabel}
+            
+            
+            
 
-        button(class="btn btn-primary" type='submit') Submit
+        
 
         if errors 
             ul
@@ -88,3 +106,4 @@ block content
     script(src="https://unpkg.com/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js") 
 
     script(type="text/javascript" src="/javascripts/authorFormDatePicker.js")
+    script(type="text/javascript" src="/javascripts/authorList.js")

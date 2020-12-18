@@ -3,12 +3,97 @@ extends layout
 
 block content
 
-    h1 #{title}
+    h2 #{title}
 
-    form(method='POST' action='')
+    form#book_form(method='POST' action='')
+        input(type="hidden" name="authorIDs" id="authorIDs" value=(undefined===authorIDs ? '' : authorIDs))
+        input(type="hidden" name="genreIDs" id="genreIDs" value=(undefined===genreIDs ? '' : genreIDs))
+        input#sendDuplicateAlert(type='hidden' name='sendDuplicateAlert' value=(undefined===sendDuplicateAlert ? '0' : createDupe))
 
-        div.form-group
+        input#_id(type='hidden' name='_id' value=(undefined===book ? '' : book._id))
+
+
+        div(class="form-group form-group-sm")
             label(for='title') #[strong Title:] 
-            input#title(class="form-control" type='text', placeholder='Title' name='title' required='true'  value=(undefined===book ? '' : book.title))
+            input#title(class="form-control" type='text', placeholder='Title' name='title' value=(undefined===book ? '' : book.title))
 
-        button(class="btn btn-primary" type='submit') Submit
+        if authors.length > 0
+            div.form-group
+                label(for='author') #[strong Author:] 
+                select#authorSelect(class="form-control" name='author' multiple  )
+                    each author in authors
+                        - if (authorIDs.includes(author._id))
+                            option(value=author._id selected) #{author.first_name} #{author.family_name}
+                        - else 
+                            option(value=author._id) #{author.first_name} #{author.family_name}
+        else
+            div.form-group
+                span #[strong Author:]
+                    div(class="text-danger") Please create authors before attempting to create a books
+                    
+
+ 
+        div.form-group
+            label(for='summary') #[strong Summary:]
+            textarea#summary.form-control(type='textarea', placeholder='Summary' name='summary' ) #{undefined===book ? '' : book.decodedSummary}
+    
+        div.form-group
+            label(for='isbn') #[strong ISBN:]
+            input#isbn.form-control(type='text', placeholder='ISBN13' name='isbn' value=(undefined===book ? '' : book.isbn) ) 
+
+
+        if genres.length > 0
+            - var i = 0
+            - var maxCols = 5
+            div.form-group
+                label #[strong Genre:]
+                table(border="0")
+                    each genre in genres
+                        - i = i + 1
+                        if i % maxCols == 1
+                            <tr>
+    
+                        <td>
+                      
+                            if (genreIDs.includes(genre._id))
+                                input(type='checkbox', name='genre', id=genre._id, value=genre._id checked )
+                            else
+                                input(type='checkbox', name='genre', id=genre._id, value=genre._id  )
+                        
+                        label(for=genre._id style='padding-right:10px; padding-left:2px;') #{genre.decodedName}
+                        </td>
+
+                        if i % maxCols == 0 || i == genres.length
+                            </tr>
+        else
+           div.form-group
+                span #[strong Genre:]
+                    div(class="text-danger") Please create genres before attempting to create a books
+
+         
+        if sendDuplicateAlert == 1
+            if duplicate == "titleAndAuthor"
+                span A&nbsp; 
+                a(href=duplicateBookURL) book 
+                span with this title and author already exists
+                div Please edit the title or author to submit this book
+                br
+            else
+                span A&nbsp;
+                    a(href=duplicateBookURL) book 
+                    span with this ISBN already exists
+                    div Please edit the ISBN to submit this book
+                    br
+
+        
+        if authors.length > 0 && genres.length > 0
+            span
+                button(class="btn btn-primary" type='submit') Submit
+
+        if errors 
+            ul
+                for error in errors
+                    li!= error.msg
+
+        script(src="/javascripts/multiselect.min.js")
+        script(type="text/javascript" src="/javascripts/bookForm.js")

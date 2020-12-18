@@ -1,0 +1,68 @@
+mongod -f "C:\Program Files\MongoDB\Server\4.4\bin\mongod.cfg"
+
+cd C:\NodeRoot\cleanblog
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Introduction
+
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/skeleton_website
+
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/development_environment
+
+Express generator to create a skeleton express application
+npm install express-generator -g
+
+Generate the express-locallibrary-tutorial app
+1) express express-locallibrary-tutorial --view=pug
+
+2) change directory:
+   cd C:\NodeRoot\express-locallibrary-tutorial
+
+3) install dependencies:
+   npm install
+
+4)  run the app:
+    SET DEBUG=express-locallibrary-tutorial:* & npm start
+    SET DEBUG=express-locallibrary-tutorial:* & npm run devstart
+    
+
+To log into MongoDB from Nodejs
+mongo "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.pagxe.mongodb.net/local_library?retryWrites=true&w=majority"
+
+I am here - Working with forms - Book form
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/forms/Create_book_form
+
+asynchronous documentation
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Displaying_data/flow_control_using_async
+read this
+http://callbackhell.com/
+
+Here for how to implement validators to share validation for insert and edit the same object
+https://stackoverflow.com/questions/55772477/how-to-implement-validation-in-a-separate-file-using-express-validator
+ 
+
+See the bottom of this pages for more documentation
+https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
+
+
+See this about environent variables
+https://itnext.io/how-to-use-environment-variables-in-node-js-cb2ef0e9574a
+https://dev.to/numtostr/environment-variables-in-node-js-the-right-way-15ad
+
+datepicker
+https://uxsolutions.github.io/bootstrap-datepicker/?markup=component&format=&weekStart=&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=4&todayBtn=false&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&keyboardNavigation=on&forceParse=on#sandbox
+
+
+jquery cdn
+https://code.jquery.com/
+
+Bootstrap 4.5 quick start
+https://www.bootstrapcdn.com/
+
+To get themes
+https://bootswatch.com/
+
+javascript scrolling
+https://javascript.info/size-and-scroll-window

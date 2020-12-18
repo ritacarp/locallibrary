@@ -27,7 +27,7 @@ const libraryConnectString = process.env.LIBRARY_DB_URI
 //Set up mongoose connection
 var mongoose = require('mongoose');
 var mongoDB = process.env.LIBRARY_DB_URI
-mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
+mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true, useFindAndModify: false, useCreateIndex:true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -54,7 +54,13 @@ app.use('/catalog', catalogRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   console.log("in error handler, creating a 404")
-  next(createError(404));
+  if (process.env.NODE_ENV === 'development') 
+    next(createError(404));
+  else {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/html');
+    res.render('resourceNotFound')
+  }
 });
 
 // error handler

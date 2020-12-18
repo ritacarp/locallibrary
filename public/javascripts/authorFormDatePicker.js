@@ -1,6 +1,7 @@
 
 
 $(function () {
+
         $('#date_of_birth_dp').datepicker(
                 {
                         format: 'mm/dd/yyyy',
@@ -311,9 +312,15 @@ $(function () {
         */
 
        
-
+       $('#saveDuplicate').on("click", function() {
+               $('#createDupe').val(1)
+               //alert("save duplicate button clicked, the value of createDupe is "  + $('#createDupe').val())
+               $("form").submit()
+       })
  
 });     
+
+saveDuplicate
 
 console.log("The datepicker is initialized")
 

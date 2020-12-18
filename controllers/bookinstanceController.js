@@ -18,7 +18,7 @@ exports.bookinstance_list = function(req, res) {
         if (err) { return next(err); }
         //Successful, so render
         console.log("Book Instance List:" + list_instances)
-        res.render('bookinstance_list', { title: 'Book Instance List',instances: list_instances });
+        res.render('bookinstance_list', { title: 'Book Copy List',instances: list_instances });
       });
 }
 

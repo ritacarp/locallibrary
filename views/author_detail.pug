@@ -2,7 +2,10 @@ extends layout
 
 block content
 
-    h2 Author: #{author.name}
+    h2 
+        span Author: #{author.name}
+        span &nbsp;&nbsp;
+        button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="/update" data-ID=author._id) Edit
 
     if author.date_of_birth
         span #{author.date_of_birth_formatted}  
@@ -11,7 +14,11 @@ block content
     
     div(style='margin-left:20px;margin-top:20px')
 
-        h4 Books
+        - var qStr = 'authorID=' + author._id
+        h4 
+            span Books
+            span &nbsp;&nbsp;
+            button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book" data-action="/create" data-qs=qStr) Add A Book
 
         dl
             each book in author_books
@@ -21,6 +28,8 @@ block content
                         a(href=book.author.url) #{book.author.name} 
                     //-
                         | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
-                dd #{book.summary} 
+                dd #{book.decodedSummary} 
             else
                 dt There are no books written by this author
+
+    script(type="text/javascript" src="/javascripts/authorList.js")

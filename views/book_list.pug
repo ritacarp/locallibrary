@@ -2,16 +2,36 @@ extends layout
 
 block content
 
-  h1= title
-  
-  
-  ul
-  
-    - book_list.sort(function(a, b) {let textA = a.title.toUpperCase(); let textB = b.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
-    each book in book_list
-      li 
-        a(href=book.url) #{book.title} 
-        | (#{book.author.name})
+  h2= title
 
-    else
-      li There are no books.
+  table(style='width:90%;'  class="table table-hover table-sm")
+    thead(class="thead-dark")
+      tr
+        th(width="55%") Name
+        th Author
+        th
+          <a href="/catalog/book/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
+          
+
+      tbody
+  
+        - book_list.sort(function(a, b) {let textA = a.title.toUpperCase(); let textB = b.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        each book in book_list
+          tr 
+            td
+              a(href=book.url) #{book.title} 
+            td 
+              each val, idx in book.author
+                a(href=val.url) #{val.first_name} #{val.family_name}
+                  if idx < (book.author.length - 1)
+                    |,
+                |&nbsp;
+            td
+              button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book/" data-action="/update" data-ID=book._id) Edit Book
+
+        else
+          tr 
+            td
+              There are no books.
+
+  script(type="text/javascript" src="/javascripts/authorList.js")

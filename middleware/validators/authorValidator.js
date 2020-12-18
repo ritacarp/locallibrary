@@ -19,9 +19,10 @@ exports.validateAuthorForm = [
                 console.log("'First Name must not be blank.")
                 return Promise.reject('First Name must not be blank.');
             } else {
-                var RegEx = /^[a-z0-9]+$/i; 
-                var isValid = RegEx.test(escape(vName)); 
+                var RegEx = /^[[A-Za-z0-9 ]+$/i; 
+                var isValid = RegEx.test(vName); 
                 if (!isValid) {
+                    console.log("\n\nauhtor validator: vName = " + vName + "\n\n")
                     return Promise.reject('First Name must not contain non-alphanumeric characters.');
                     
                 }  else  {return Promise.resolve} 
