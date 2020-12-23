@@ -3,3 +3,12 @@
     padding: 0;
     list-style: none;
 }
+
+.popover {
+    min-width: 500px;
+  }
+
+  .popover-header {
+      color:white;
+      background-color: #343a40;
+  }

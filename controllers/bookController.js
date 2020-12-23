@@ -7,6 +7,7 @@ var BookInstance = require('../models/bookinstance');
 var async = require('async');
 const { body, validationResult, check, matchedData, params } = require("express-validator");
 var mongoose = require('mongoose');
+const paginate = require('express-paginate');
 
 var async = require('async');
 
@@ -45,15 +46,88 @@ exports.index = function(req, res, next) {
 
 
 // Display list of all books.
-exports.book_list = function(req, res, next) {
-    Book.find({}, 'title author')
+exports.book_list = [
+function(req, res, next) {
+
+    var col=req.query.col
+    var order = req.query.sort
+
+
+    var sortObj = new Object;
+    sortObj= {[col]: order}
+    
+
+    var arrow="up"
+    if (order=="-1") arrow="down"
+
+    //var mysort = { col: order  };
+
+    /*
+    console.log("\n\nreq.skip = " + req.skip)
+    console.log("req.query.limit = " + req.query.limit)
+    console.log("req.query.page = " + req.query.page)
+    console.log("\n\n")
+    */
+
+ 
+    var vLimit=process.env.ITEMS_PER_PAGE * 1
+    if (req.query.limit) vLimit = req.query.limit * 1
+    if (vLimit==0) vLimit=process.env.ITEMS_PER_PAGE * 1
+    
+    var vPage=1
+    if (req.query.page) vPage = req.query.page
+
+    var vSkip=0
+    if (req.skip) vSkip=req.skip
+    else vSkip=vLimit * (vPage-1)
+
+    var vSearchStr=""
+    var vSearchRegex=""
+    var vSearchQuery = {}
+    if (req.query.search ) {
+        vSearchStr = req.query.search
+        vSearchRegex = new RegExp(req.query.search,"i");
+        vSearchQuery = { "title": vSearchRegex }
+    }
+    
+    
+
+    /*
+    console.log("\n\nvSkip = " + vSkip)
+    console.log("vLimit = " + vLimit)
+    console.log("vPage = " + vPage)
+    console.log("vSearchStr = " + vSearchStr)
+    console.log("\n\n")
+    */
+
+ 
+    
+
+
+    Book.find(vSearchQuery, {"title":1, "author":1})
     .populate('author')
+    .sort(sortObj)
+    .limit(vLimit).skip(vSkip).lean()
+    
     .exec(function (err, list_books) {
       if (err) { return next(err); }
       //Successful, so render
-      res.render('book_list', { title: 'Book List', book_list: list_books });
+      Book.countDocuments(vSearchQuery, function(err, bookCount) {
+        if (err) { return next(err); }
+        console.log('Book Count is ' + bookCount);
+
+        const itemCount = bookCount;
+        console.log("\n\nbook_list: itemCount = " + itemCount + "; vLimit =" + vLimit)
+        const pageCount = Math.ceil(itemCount / vLimit);
+        //res.render('book_list', { title: 'Book List', book_list: list_books, currentPage: vPage, pageCount, itemCount, arrow:arrow, sortOrder:order, pages: paginate.getArrayPages(req)(50, pageCount, req.query.page) });
+        res.render('book_list', { title: 'Book List', book_list: list_books, currentPage: vPage, pageCount, itemCount, itemsOnPage:vLimit, arrow:arrow, sortOrder:order, searchString:vSearchStr });
+        
+        })
     });
-};
+
+    
+},
+]
 
 // Display detail page for a specific book.
 exports.book_detail = function(req, res, next) {

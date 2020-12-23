@@ -1,5 +1,6 @@
 var createError = require('http-errors');
-var express = require('express');
+const express = require('express');
+const paginate = require('express-paginate');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 //var bodyParser = require("body-parser")
@@ -16,7 +17,7 @@ var wikiRouter = require('./routes/wiki.js');
 var catalogRouter = require('./routes/catalog');  //Import routes for "catalog" area of site
 
 
-var app = express();
+const app = express();
 app.locals.moment = require('moment');
 
 const port = process.env.PORT
@@ -44,6 +45,14 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(bodyParser.json())
 //app.use(bodyParser.urlencoded({extended:true}))
+
+
+//app.use('/catalog/books', paginate.middleware(5, 50));
+
+app.use('/catalog/books', function (req, res, next) {
+  console.log('\n\nRequest Type: ' +  req.method + "; url =  " + req.url + "\n\n")
+  next()
+})
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

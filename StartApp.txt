@@ -41,6 +41,11 @@ http://callbackhell.com/
 
 Here for how to implement validators to share validation for insert and edit the same object
 https://stackoverflow.com/questions/55772477/how-to-implement-validation-in-a-separate-file-using-express-validator
+
+Here for pagination
+https://www.npmjs.com/package/express-paginate
+I am using this
+https://flaviusmatis.github.io/simplePagination.js/
  
 
 See the bottom of this pages for more documentation

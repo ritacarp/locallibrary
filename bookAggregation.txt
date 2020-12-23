@@ -1,0 +1,30 @@
+const aggregate = Book.aggregate([
+  {
+    '$lookup': {
+      'from': 'authors', 
+      'localField': 'author', 
+      'foreignField': '_id', 
+      'as': 'authors'
+    }
+  }, {
+    '$unwind': {
+      'path': '$authors', 
+      'includeArrayIndex': 'idx'
+    }
+  }, {
+    '$project': {
+      'title': 1, 
+      'first_name': '$authors.first_name', 
+      'family_name': '$authors.family_name'
+    }
+  }, {
+    '$sort': {
+      'title': 1
+    }
+  }, {
+    '$skip': 0
+  }, {
+    '$limit': 5
+  }
+]).exec(function (err, list_books) {
+})

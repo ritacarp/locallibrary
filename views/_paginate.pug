@@ -1,0 +1,38 @@
+//- _paginate.pug
+ 
+//- This examples makes use of Bootstrap 3.x pagination classes
+ 
+if paginate.hasPreviousPages || paginate.hasNextPages(pageCount)
+    ul(class="pagination")
+        
+
+
+        if paginate.hasPreviousPages
+            li(class="page-item")
+                a.page-link(href=paginate.href(true)).prev
+                    i.fa.fa-arrow-circle-left
+                    |  Previous
+        else
+            li(class="page-item disabled")
+                a.page-link(href="#" tabindex="-1")
+                    i.fa.fa-arrow-circle-left
+                    |  Previous
+        
+        if pages
+            each page in pages
+                if page.number!=currentPage
+                    li(class="page-item")
+                        a.page-link(href=page.url)= page.number
+                else
+                    li(class="page-link" style="font-weight:bold;color:red;")= page.number
+
+        if paginate.hasNextPages(pageCount)
+            li(class="page-item")
+                a.page-link(href=paginate.href()).next
+                    | Next&nbsp;
+                    .fa.fa-arrow-circle-right
+        else
+            li(class="page-item disabled")
+                a.page-link(href="#" tabindex="-1")
+                    | Next&nbsp;
+                    i.fa.fa-arrow-circle-right

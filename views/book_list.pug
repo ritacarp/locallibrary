@@ -1,37 +1,122 @@
 extends layout
 
 block content
+  table(border="0", width="90%")
+    tr
+      td
+        h2= title
+      td(style="text-align:right; padding-right:40px;")
+        button(type="button" class="btn btn-outline-primary btn-sm popover-dismiss" title="Search for Books"  data-container="body" data-toggle="popover"   )
+          i( id="searchIcon" class="glyphicon glyphicon-search fa fa-search" )
+        |&nbsp;&nbsp;
+        if searchString != ""
+          button(type="button" class="btn btn-outline-primary btn-sm")
+            i( id="clearSearchIcon" class="glyphicon glyphicon-search-minus fa fa-search-minus" data-route="/catalog/books/" data-col="title" )
 
-  h2= title
+        //-
+          form(action="")
+            div(class="input-group")
+            //-
+              input#search(type='text' class="form-control form-control-sm" style="margin-right:5px" name='search' value="")
+            //-
+              span(class="input-group-addon  input-group-append")
+                div(class="input-group-text")
+                  i( id="searchIcon" class="glyphicon glyphicon-search fa fa-search")
+            //-
+              button(type="button" class="btn btn-outline-primary btn-sm") Search
+            
+            //-
+              button(type="button" class="btn btn-outline-primary btn-sm share-btn popover-dismiss" data-toggle="popover" title="Search" data-content="And here's some amazing content. It's very engaging. Right?") Search
 
-  table(style='width:90%;'  class="table table-hover table-sm")
+            
+            button(type="button" class="btn btn-outline-primary btn-sm popover-dismiss"  data-container="body" data-toggle="popover" title="Search" ) 
+              i( id="searchIcon" class="glyphicon glyphicon-search fa fa-search" style="padding-left:2px; ")
+              //-
+                span(class="glyphicon glyphicon-search")
+ 
+    
+
+  - var upOrDown= arrow
+  - var vClass="fa fa-arrow-circle-" + upOrDown
+  - var vSortOrder= sortOrder
+
+ 
+  
+  //-
+    a(href=paginate.href({ sort: 'title' })) Sort by title
+    a(href=paginate.href({ sort: req.query.title === '1' ? -1 : 1 })) Sort by the title
+
+  table(border='0' style='width:90%;'  class="table table-hover table-sm")
     thead(class="thead-dark")
       tr
-        th(width="55%") Name
-        th Author
+        th(width="55%") Title 
+          a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/books/" data-col="title" data-sortOrder=vSortOrder)
+            i(class=vClass)
+        th(width="30%") Author
         th
           <a href="/catalog/book/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
           
 
-      tbody
+    tbody
   
-        - book_list.sort(function(a, b) {let textA = a.title.toUpperCase(); let textB = b.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
-        each book in book_list
-          tr 
-            td
-              a(href=book.url) #{book.title} 
-            td 
-              each val, idx in book.author
-                a(href=val.url) #{val.first_name} #{val.family_name}
-                  if idx < (book.author.length - 1)
-                    |,
-                |&nbsp;
-            td
-              button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book/" data-action="/update" data-ID=book._id) Edit Book
+      
+      each book in book_list
+        tr 
+          td
+            -var bookURL= "/catalog/book/" + book._id
+            a(href=bookURL) #{book.title} 
+          td 
+            each val, idx in book.author
+              -var authorURL = "/catalog/author/" + val._id
+              a(href=authorURL) #{val.first_name} #{val.family_name}
+                if idx < (book.author.length - 1)
+                  |,
+              |&nbsp;
+          td
+            button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book/" data-action="/update" data-ID=book._id) Edit Book
 
-        else
-          tr 
-            td
-              There are no books.
+      else
+         tr 
+           td
+            There are no books.
+  
+  
+
+  table(border="0", width="90%")
+    tr
+      td(width="55%")
+        div(id="light-pagination" class="pagination")
+      td(width="30%")
+        label(for='selectItemsPerPage') #[strong Items per Page:&nbsp;]
+        select(name="selectItemsPerPage" id="selectItemsPerPage")
+          each val in [1, 5, 10, 25, 50, 100]
+            - if (val == itemsOnPage)
+              option(value=val selected)= val
+            - else 
+              option(value=val)= val
+      td
+        span &nbsp;
+
+
+
+  div(id="currentPage" style="display: none" data-value=currentPage)
+  div(id="itemCount" style="display: none" data-value=itemCount)
+  div(id="itemsOnPage" style="display: none" data-value=itemsOnPage)
+  div(id="searchString" style="display: none" data-value=searchString)
+
+  //-
+    include _paginate
+
+    pagination
+
+
+
+
 
   script(type="text/javascript" src="/javascripts/authorList.js")
+
+  script(type="text/javascript" src="/javascripts/searchPopover.js")
+
+  script(type="text/javascript" src="/javascripts/pagination.js")
+
+  
