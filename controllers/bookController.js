@@ -40,7 +40,7 @@ exports.index = function(req, res, next) {
         }
     }, function(err, results) {
         console.log(results)
-        res.render('index', { title: 'Local Library Home', error: err, data: results });
+        res.render('index', { title: `Rita's Local Library`, error: err, data: results });
     });
 };
 

@@ -34,14 +34,36 @@ html(lang='en')
     link(rel="stylesheet" href="/stylesheets/simplePagination.css")
   
 
-
-
-    
-    
     
  
-  body(style="font-size:14px")
+  body(style="font-size:14px;")
     div(class='container-fluid')
+
+      div(class='row' )
+        div(class='col-sm-12' style="margin: 0; padding: 0; width: 100%;")
+          nav(class="navbar navbar-expand-md navbar-light")
+            a(class="navbar-brand" href="/")
+              span(style="font-weight:bold;font-size: 16px;")
+                span(class="text-primary") R
+                span(class="text-danger") I
+                span(style="color:gold") T
+                span(class="text-success") A
+                span(style="color:RoyalBlue") '
+                span(style="color:Magenta") S
+                span(class="text-danger") &nbsp;Local Library
+            button(aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navbar" data-toggle="collapse" type="button")
+              span(class="navbar-toggler-icon")
+            div(class="collapse navbar-collapse" id="navbar")
+                ul(class="navbar-nav ml-auto mt-2")
+                  li(class="nav-item")
+                    a(class="nav-link" href="/auth/login" style="color: rgb(248, 249, 250)!important;") Please Log In
+                  li(class="nav-item")
+                    a(class="nav-link" href="/auth/register" style="color: rgb(248, 249, 250)!important;") Register
+
+
+
+
+
       div(class='row')
         div(class='col-sm-2')
           block sidebar

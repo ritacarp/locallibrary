@@ -1,19 +1,27 @@
 extends layout
 
 block content
-  h2= title
-  p Welcome to #[em LocalLibrary], a very basic Express website developed as a tutorial example on the Mozilla Developer Network.
+  h3(style="font-family: sans-serif;color: black;padding-top:10px")= title
+  p(style="font-family: sans-serif;color: #4582ec;") Welcome to Rita's Local Library, an 
+    span(style="font-family: sans-serif;color: black;font-weight:bold;") Express/Node.js/MongoDB 
+    span(style="font-family: sans-serif;color: #4582ec;") website developed as an example of my work.
 
-  h1 Dynamic content
+  //-
+    h1 Dynamic content
 
   if error
-    p Error getting dynamic content.
+    p(style="font-family: sans-serif;color: #4582ec;") Error getting dynamic content.
   else
-    p The library has the following record counts:
+    p(style="font-family: sans-serif;color: #4582ec;") The library has the following record counts:
 
-    ul
-      li #[strong Books:] !{data.book_count}
-      li #[strong Copies:] !{data.book_instance_count}
-      li #[strong Copies available:] !{data.book_instance_available_count} 
-      li #[strong Authors:] !{data.author_count}
-      li #[strong Genres:] !{data.genre_count}
+    ul(style="font-family: sans-serif;")
+      li(style="color:#4582ec;") Books:&nbsp;&nbsp;
+        span(style="color: black;font-weight:bold;") !{data.book_count}
+      li(style="color:#4582ec;") Copies:&nbsp;&nbsp;
+        span(style="color: black;font-weight:bold;") !{data.book_instance_count}
+      li(style="color:#4582ec;") Copies available:&nbsp;&nbsp;
+        span(style="color: black;font-weight:bold;") !{data.book_instance_available_count} 
+      li(style="color:#4582ec;") Authors:&nbsp;&nbsp;
+        span(style="color: black;font-weight:bold;") !{data.author_count}
+      li(style="color:#4582ec;") Genres:&nbsp;&nbsp;
+        span(style="color: black;font-weight:bold;") !{data.genre_count}
