@@ -1,0 +1,55 @@
+extends layout
+
+block content
+
+  h2= title
+
+  table(style='width:90%'  class="table table-hover table-sm")
+    thead(class="thead-dark")
+      tr
+        th(width="60%") Title
+        th Status
+        th
+          <a href="/catalog/bookinstance/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
+
+      tbody
+        //-
+          - var order=-1
+          - var reverse= order * -1
+          - instances.sort(function(a, b) {let textA = a.bookTitle.toUpperCase(); let textB = b.bookTitle.toUpperCase(); return (textA < textB) ? reverse : (textA > textB) ? order : 0;});
+        each instance in instances
+          tr
+            td
+              -var instanceURL= "/catalog/bookinstance/" + instance._id
+              a(href=instanceURL) #{instance.book.title} 
+              br
+
+              each val, idx in instance.book.author
+                if idx == 0
+                  span by 
+                else
+                  |, 
+                - var authorURL = "/catalog/author/" + val._id
+                a(href=authorURL) #{val.first_name} #{val.family_name}
+                  if idx < (val.length - 1)
+                    br
+                |&nbsp;
+            
+            td
+
+              if instance.status=='Available'
+                span.text-success #{instance.status}
+              else if instance.status=='Maintenance'
+                span.text-danger #{instance.status}
+              else
+                span.text-warning #{instance.status}
+              if instance.status!='Available'
+                div  (Due: #{instance.due_back_formatted} )
+
+            td
+              button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/update" data-ID=instance._id) Edit Book Copy
+        else
+          No books available
+
+  script(type="text/javascript" src="/javascripts/authorList.js")
+       

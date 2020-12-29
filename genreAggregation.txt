@@ -1,0 +1,35 @@
+
+let docs = await Bookinstance.aggregate(
+[
+  {
+    '$lookup': {
+      'from': 'books', 
+      'localField': '_id', 
+      'foreignField': 'genre', 
+      'as': 'booksInGenre'
+    }
+  }, {
+    '$lookup': {
+      'from': 'bookinstances', 
+      'localField': 'booksInGenre._id', 
+      'foreignField': 'book', 
+      'as': 'copies'
+    }
+  }, {
+    '$project': {
+      '_id': 1, 
+      'name': 1, 
+      'bookCount': {
+        '$size': '$booksInGenre'
+      }, 
+      'copyCount': {
+        '$size': '$copies'
+      }
+    }
+  }, {
+    '$sort': {
+      'name': -1
+    }
+  }
+]
+)

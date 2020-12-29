@@ -1,0 +1,39 @@
+let docs = await Bookinstance.aggregate([
+  {
+    '$lookup': {
+      'from': 'books', 
+      'localField': 'book', 
+      'foreignField': '_id', 
+      'as': 'book'
+    }
+  }, {
+    '$project': {
+      'bookID': {
+        '$arrayElemAt': [
+          '$book._id', 0
+        ]
+      }, 
+      'bookTitle': {
+        '$arrayElemAt': [
+          '$book.title', 0
+        ]
+      }, 
+      'bookAuthors': {
+        '$arrayElemAt': [
+          '$book.author', 0
+        ]
+      }
+    }
+  },  {
+    '$lookup': {
+      'from': 'authors', 
+      'localField': 'bookAuthors', 
+      'foreignField': '_id', 
+      'as': 'author'
+    }
+  }, {
+    '$sort': {
+      'author.family_name': -1
+    }
+  }
+])

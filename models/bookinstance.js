@@ -7,7 +7,7 @@ var BookInstanceSchema = new Schema(
   {
     book: { type: Schema.Types.ObjectId, ref: 'Book', required: true }, //reference to the associated book
     imprint: {type: String, required: true},
-    status: {type: String, required: true, enum: ['Available', 'Maintenance', 'Loaned', 'Reserved'], default: 'Maintenance'},
+    status: {type: String, required: true, enum: ['Available', 'Maintenance', 'Loaned', 'Reserved'], default: 'Available'},
     due_back: {type: Date, default: Date.now}
   }
 );
@@ -23,6 +23,24 @@ BookInstanceSchema
 .virtual('due_back_formatted')
 .get(function () {
   return DateTime.fromJSDate(this.due_back).toLocaleString(DateTime.DATE_MED_WITH_WEEKDAY);
+});
+
+
+BookInstanceSchema
+.virtual('due_back_short')
+.get(function () {
+  if (this.due_back) {
+    return DateTime.fromJSDate(this.due_back).toLocaleString(DateTime.DATE_SHORT);
+  }
+  else return ""
+});
+
+
+
+BookInstanceSchema
+.virtual('decodedImprint')
+.get(function () {
+  return he.decode(this.imprint);
 });
 
 //Export model

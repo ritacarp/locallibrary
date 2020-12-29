@@ -2,12 +2,123 @@ var Genre = require('../models/genre');
 var Book = require('../models/book');
 var async = require('async');
 const { body,validationResult,check } = require("express-validator");
+const helpers = require('../controllers/helpers/helpers')
 const he = require('he');
 
 
 // Display list of all Genre.
-
 exports.genre_list = async function(req, res,next) {
+      //res.send('NOT IMPLEMENTED: Genre list');
+
+  var getRequestParams = helpers.getRequestParams(req,"name")
+  var order = getRequestParams.order
+  var arrow = getRequestParams.arrow
+  var vLimit = getRequestParams.limit
+  var vPage = getRequestParams.page
+  var vSkip = getRequestParams.skip
+  var vSearchStr = getRequestParams.searchStr
+  var vSearchQuery = getRequestParams.searchQuery
+  var sortObj = getRequestParams.sortObj
+
+  var matchStage
+  if (vSearchStr) {
+      matchStage = {
+          '$match': 
+              vSearchQuery
+          
+      }
+  }
+
+  var bookLookupStage =  {
+    '$lookup': {
+      'from': 'books', 
+      'localField': '_id', 
+      'foreignField': 'genre', 
+      'as': 'booksInGenre'
+    }
+}  // bookLookupStage
+
+var copyLookupStage =  {
+  '$lookup': {
+    'from': 'bookinstances', 
+    'localField': 'booksInGenre._id', 
+    'foreignField': 'book', 
+    'as': 'copies'
+  }
+} // copyLookupStage
+
+var projectStage = {
+  '$project': {
+    '_id': 1, 
+    'name': 1, 
+    'bookCount': {
+    '$size': '$booksInGenre'
+    }, 
+    'copyCount': {
+      '$size': '$copies'
+    }
+  }
+}  // projectStage
+
+var sortStage = {
+  '$sort': 
+      sortObj
+}
+
+
+//var skipStage = { "$skip": vSkip }
+
+//var limitStage = { "$limit": vLimit }
+
+
+
+var queryPipeline = []
+
+if (vSearchStr) {
+  queryPipeline.push(matchStage)
+}
+queryPipeline.push(bookLookupStage)
+queryPipeline.push(copyLookupStage)
+queryPipeline.push(projectStage)
+queryPipeline.push(sortStage)
+
+var countingPipeline = []
+if (vSearchStr) {
+  countingPipeline.push(matchStage)
+}
+countingPipeline.push(bookLookupStage)
+countingPipeline.push(copyLookupStage)
+countingPipeline.push(projectStage)
+countingPipeline.push(sortStage)
+countingPipeline.push({ $count: "count" })
+
+try {
+  const list_genres = await Genre.aggregate(queryPipeline)
+  const instanceCount = await Genre.aggregate(countingPipeline)
+  var itemCount = instanceCount[0]["count"]
+  const pageCount = Math.ceil(itemCount / vLimit);
+
+  var lower = vSkip
+  var upper = vSkip + vLimit
+  if (upper > itemCount ) {upper = itemCount}
+  list_genres_slice = list_genres.slice(lower,upper)
+
+  res.render('genre_list', { title: 'Genre List', genre_list:list_genres_slice, he: require("he"), currentPage: vPage, pageCount, itemCount, itemsOnPage:vLimit, arrow:arrow, sortOrder:order, searchString:vSearchStr });
+
+
+} catch (err) {
+  return next(err)
+}
+  
+
+}; // exports genre_list
+
+        
+
+  
+
+
+exports.BACKUP_genre_list = async function(req, res,next) {
     //res.send('NOT IMPLEMENTED: Genre list');
     let genres
 
@@ -17,15 +128,21 @@ exports.genre_list = async function(req, res,next) {
         // both of these sorts work
         //genres = await Genre.find({}).sort([['name', 'ascending']])
         
-        genres = await Genre.find({}).sort({name:1})
+        genres = await Genre.find({}).sort({name:1}).lean()
+
         for (let i = 0; i < genres.length; i++) {
             genres[i].name = he.decode(genres[i].name)
             // console.log("Genre Name = " + genres[i].name + "_id = " + genres[i]._id)
             books = await Book.find({ 'genre': genres[i]._id }, {title:1, author:1})
             .sort([['title', 'ascending']])
             .populate('author')
-            let oneGenre = {"genre":genres[i], "books": books};
-            
+            bookCount = await Book.find({ 'genre': genres[i]._id }).count()
+
+            console.log("\n\n")
+            console.log("count of books for genre " + genres[i].name + " = " + bookCount)
+            console.log("\n\n")
+
+            let oneGenre = {"genre":genres[i], "books": books, "bookCount":bookCount};
             allGenres.push(oneGenre)
         }
     //docs = cursor.toArray()
@@ -35,10 +152,7 @@ exports.genre_list = async function(req, res,next) {
         //return allGenres
     }
 
-    res.render('genre_list', { title: 'Genre List', genre_list: allGenres });
-
-
-
+    res.render('BACKUP_genre_list', { title: 'BACKUP Genre List', genre_list: allGenres });
 
 
     /*
@@ -66,7 +180,7 @@ exports.genre_detail = function(req, res,next) {
         genre_books: function(callback) {
             Book.find({ 'genre': req.params.id })
             .populate('author')
-              .exec(callback);
+            .exec(callback);
         },
 
     },

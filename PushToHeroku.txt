@@ -1,0 +1,54 @@
+
+heroku git:clone -a nodejs-express-library
+
+git add app.js
+git add authorAggregation.txt
+git add bookAggregation.txt
+git add bookAggregation_01.txt.txt
+git add bookAuthorToArray.js
+git add bookInstanceAggregation.txt
+git add genreAggregation.txt
+git add package.json
+git add package-lock.json
+git add populatedb.js
+git add PushToHeroku.txt
+git add simple.js
+git add StartApp.txt
+git add testCallback.js
+
+git add bin
+git add controllers
+git add middleware
+git add models
+git add public
+git add routes
+git add views
+
+
+git commit -m "Added paging and search to book list"
+git push
+git push heroku main
+
+git rm -r public\javascripts\x_helper.js
+git rm -r public\javascripts\x_multiselect.core.js
+git rm -r public\javascripts\x_multiselect.js
+
+git commit -m "Deleted unused files"
+git push
+git push heroku main
+
+https://nodejs-express-library.herokuapp.com/
+
+
+https://www.freecodecamp.org/news/gitignore-what-is-it-and-how-to-add-to-repo/
+
+To untrack a single file, ie stop tracking the file but not delete it from the system use:
+git rm --cached filename
+
+About dotenv module
+http://zetcode.com/javascript/dotenv/
+
+
+To get themes
+https://bootswatch.com/
+

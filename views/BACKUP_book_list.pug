@@ -30,8 +30,7 @@ block content
         th(width="50%") Title 
           a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/books/" data-col="title" data-sortOrder=vSortOrder)
             i(class=vClass)
-        th(width="20%") Author
-        th Copies
+        th(width="25%") Author
         th
           <a href="/catalog/book/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
           
@@ -40,18 +39,16 @@ block content
   
       each book in book_list
         tr 
-          -var bookURL= "/catalog/book/" + book._id
           td
+            -var bookURL= "/catalog/book/" + book._id
             a(href=bookURL) #{book.title} 
           td 
-            each val, idx in book.authors
+            each val, idx in book.author
               -var authorURL = "/catalog/author/" + val._id
               a(href=authorURL) #{val.first_name} #{val.family_name}
-                if idx < (book.authors.length - 1)
-                  |<br>
-
-          td
-            a(href=bookURL) #{book.copyCount}
+                if idx < (book.author.length - 1)
+                  |,
+              |&nbsp;
           td
             button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book/" data-action="/update" data-ID=book._id) Edit Book
             span &nbsp;&nbsp;

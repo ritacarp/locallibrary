@@ -8,8 +8,10 @@ block content
     form(method='POST' action='')
 
         
-
-        input#_id(type='hidden' name='_id' value=(undefined===author ? '' : author._id))
+        if mode=="c" 
+            input#_id(type='hidden' name='_id' value='')
+        else
+            input#_id(type='hidden' name='_id' value=(undefined===author ? '' : author._id))
         input#createDupe(type='hidden' name='createDupe' value=(undefined===createDupe ? '0' : createDupe))
         input#sendDuplicateAlert(type='hidden' name='sendDuplicateAlert' value=(undefined===sendDuplicateAlert ? '0' : createDupe))
 

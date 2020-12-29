@@ -21,10 +21,17 @@ block content
             each book in genre_books
                 dt 
                     a(href=book.url) #{book.title} 
-                    a(href=book.author.url) #{book.author.name} 
+                    //-
+                        a(href=book.author.url) #{book.author.name} 
+                    span by 
+                    each val, idx in book.author
+                        a(href=val.url) #{val.first_name} #{val.family_name}
+                            if idx != (book.author.length-1)
+                                |, 
+
                     //-
                         | <a href= "#{book.author.url}"> (#{book.author.name})</a> 
-                dd #{book.summary}
+                dd #{book.decodedSummary}
             else
                 dd 
                     div There are no books in this genre

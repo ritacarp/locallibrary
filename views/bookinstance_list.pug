@@ -2,30 +2,58 @@ extends layout
 
 block content
 
-  h2= title
+  table(border="0", width="90%")
+    tr
+      td
+        h2= title
+      td(style="text-align:right; padding-right:40px;")
+        button(type="button" class="btn btn-outline-primary btn-sm popover-dismiss" title="Search for Book Copies"  data-container="body" data-toggle="popover"   )
+          i( id="searchIcon" class="glyphicon glyphicon-search fa fa-search" )
+        |&nbsp;&nbsp;
+        if searchString != ""
+          button(type="button" class="btn btn-outline-primary btn-sm")
+            i( id="clearSearchIcon" class="glyphicon glyphicon-search-minus fa fa-search-minus" data-route="/catalog/bookinstances/" data-col="name" )
+
+  - var upOrDown= arrow
+  - var vClass="fa fa-arrow-circle-" + upOrDown
+  - var vSortOrder= sortOrder
+
 
   table(style='width:90%'  class="table table-hover table-sm")
     thead(class="thead-dark")
       tr
-        th(width="60%") Name
+        th(width="60%") Title 
+          a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/bookinstances/" data-col="bookTitle" data-sortOrder=vSortOrder)
+            i(class=vClass)
+
+
         th Status
         th
           <a href="/catalog/bookinstance/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
 
       tbody
-        - instances.sort(function(a, b) {let textA = a.book.title.toUpperCase(); let textB = b.book.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        //-
+          - var order=-1
+          - var reverse= order * -1
+          - instances.sort(function(a, b) {let textA = a.bookTitle.toUpperCase(); let textB = b.bookTitle.toUpperCase(); return (textA < textB) ? reverse : (textA > textB) ? order : 0;});
         each instance in instances
           tr
             td
-              a(href=instance.url) #{instance.book.decodedTitle} 
+              -var instanceURL= "/catalog/bookinstance/" + instance._id
+              a(href=instanceURL) #{instance.bookTitle} 
               br
-              each val, idx in instance.book.author
-                span by 
-                a(href=val.url) #{val.first_name} #{val.family_name}
+
+              each val, idx in instance.author
+                if idx == 0
+                  span by 
+                else
+                  |, 
+                - var authorURL = "/catalog/author/" + val._id
+                a(href=authorURL) #{val.first_name} #{val.family_name}
                   if idx < (val.length - 1)
                     br
                 |&nbsp;
-          
+            
             td
 
               if instance.status=='Available'
@@ -35,12 +63,41 @@ block content
               else
                 span.text-warning #{instance.status}
               if instance.status!='Available'
-                div  (Due: #{instance.due_back_formatted} )
+                - var dueDate = luxon.DateTime.fromJSDate(instance.due_back).toLocaleString(luxon.DateTime.DATE_MED_WITH_WEEKDAY);
+                div  (Due: #{dueDate} )
 
             td
               button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/update" data-ID=instance._id) Edit Book Copy
         else
-          No books available
+          span No books copies available
+
+  table(border="0", width="90%")
+    tr
+      td(width="55%")
+        div(id="light-pagination" class="pagination")
+      td(width="30%")
+        label(for='selectItemsPerPage') #[strong Items per Page:&nbsp;]
+        select(name="selectItemsPerPage" id="selectItemsPerPage")
+          each val in [1, 5, 10, 25, 50, 100]
+            - if (val == itemsOnPage)
+              option(value=val selected)= val
+            - else 
+              option(value=val)= val
+      td
+        span &nbsp;
+
+
+
+  div(id="currentPage" style="display: none" data-value=currentPage)
+  div(id="itemCount" style="display: none" data-value=itemCount)
+  div(id="itemsOnPage" style="display: none" data-value=itemsOnPage)
+  div(id="searchString" style="display: none" data-value=searchString)
+
 
   script(type="text/javascript" src="/javascripts/authorList.js")
+
+   
+  script(type="text/javascript" src="/javascripts/searchPopover.js")
+
+  script(type="text/javascript" src="/javascripts/pagination.js")
        

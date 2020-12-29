@@ -146,7 +146,6 @@ $(function () {
  
 });     
 
-saveDuplicate
 
 console.log("The datepicker is initialized")
 

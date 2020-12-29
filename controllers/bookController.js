@@ -5,20 +5,9 @@ var Author = require('../models/author');
 var Genre = require('../models/genre');
 var BookInstance = require('../models/bookinstance');
 var async = require('async');
+const helpers = require('../controllers/helpers/helpers')
 const { body, validationResult, check, matchedData, params } = require("express-validator");
 var mongoose = require('mongoose');
-const paginate = require('express-paginate');
-
-var async = require('async');
-
-
-
-
-
-
-
-
-
 
 
 exports.index = function(req, res, next) {
@@ -44,71 +33,134 @@ exports.index = function(req, res, next) {
     });
 };
 
+exports.book_list = [
+async function(req, res, next) {
+
+
+    var getRequestParams = helpers.getRequestParams(req,"title")
+    var order = getRequestParams.order
+    var arrow = getRequestParams.arrow
+    var vLimit = getRequestParams.limit
+    var vPage = getRequestParams.page
+    var vSkip = getRequestParams.skip
+    var vSearchStr = getRequestParams.searchStr
+    var vSearchQuery = getRequestParams.searchQuery
+    var sortObj = getRequestParams.sortObj
+
+    var matchStage
+    if (vSearchStr) {
+        matchStage = {
+            '$match': 
+                vSearchQuery
+            
+        }
+    }
+
+    var authorLookupStage =  {
+        '$lookup': {
+            'from': 'authors', 
+            'localField': 'author', 
+            'foreignField': '_id', 
+            'as': 'authors'
+          }
+    } // authorLookupStage
+
+    var copyLookupStage =  {
+        '$lookup': {
+            'from': 'bookinstances', 
+            'localField': '_id', 
+            'foreignField': 'book', 
+            'as': 'copies'
+          }
+    } // copyLookupStage
+
+    var projectStage = {
+        '$project': {
+            '_id': 1, 
+            'title': 1, 
+            'authors': 1, 
+            'copyCount': {
+              '$size': '$copies'
+            }
+          }
+    } // projectStage
+
+    var sortStage = {
+        '$sort': 
+            sortObj
+      }
+
+    var queryPipeline = []
+    if (vSearchStr) {
+    queryPipeline.push(matchStage)
+    }
+    queryPipeline.push(authorLookupStage)
+    queryPipeline.push(copyLookupStage)
+    queryPipeline.push(projectStage)
+    queryPipeline.push(sortStage)
+
+    var countingPipeline = []
+    if (vSearchStr) {
+      countingPipeline.push(matchStage)
+    }
+    countingPipeline.push(authorLookupStage)
+    countingPipeline.push(copyLookupStage)
+    countingPipeline.push(projectStage)
+    countingPipeline.push(sortStage)
+    countingPipeline.push({ $count: "count" })
+
+    try {
+        const list_books = await Book.aggregate(queryPipeline)
+        const instanceCount = await Book.aggregate(countingPipeline)
+
+        var itemCount = instanceCount[0]["count"]
+        const pageCount = Math.ceil(itemCount / vLimit);
+      
+        var lower = vSkip
+        var upper = vSkip + vLimit
+        if (upper > itemCount ) {upper = itemCount}
+        list_books_slice = list_books.slice(lower,upper)
+      
+        res.render('book_list', { title: 'Book List', book_list:list_books_slice, currentPage: vPage, pageCount, itemCount, itemsOnPage:vLimit, arrow:arrow, sortOrder:order, searchString:vSearchStr });
+       
+    } catch (err) {
+        return next(err)
+    }
+
+},
+]
+
 
 // Display list of all books.
-exports.book_list = [
+exports.BACKUP_book_list = [
 function(req, res, next) {
 
-    var col=req.query.col
-    var order = req.query.sort
+    var getRequestParams = helpers.getRequestParams(req,"title")
+    var order = getRequestParams.order
+    var arrow = getRequestParams.arrow
+    var vLimit = getRequestParams.limit
+    var vPage = getRequestParams.page
+    var vSkip = getRequestParams.skip
+    var vSearchStr = getRequestParams.searchStr
+    var vSearchQuery = getRequestParams.searchQuery
+    var sortObj = getRequestParams.sortObj
 
-
-    var sortObj = new Object;
-    sortObj= {[col]: order}
-    
-
-    var arrow="up"
-    if (order=="-1") arrow="down"
-
-    //var mysort = { col: order  };
-
-    /*
-    console.log("\n\nreq.skip = " + req.skip)
-    console.log("req.query.limit = " + req.query.limit)
-    console.log("req.query.page = " + req.query.page)
-    console.log("\n\n")
-    */
-
- 
-    var vLimit=process.env.ITEMS_PER_PAGE * 1
-    if (req.query.limit) vLimit = req.query.limit * 1
-    if (vLimit==0) vLimit=process.env.ITEMS_PER_PAGE * 1
-    
-    var vPage=1
-    if (req.query.page) vPage = req.query.page
-
-    var vSkip=0
-    if (req.skip) vSkip=req.skip
-    else vSkip=vLimit * (vPage-1)
-
-    var vSearchStr=""
-    var vSearchRegex=""
-    var vSearchQuery = {}
-    if (req.query.search ) {
-        vSearchStr = req.query.search
-        vSearchRegex = new RegExp(req.query.search,"i");
-        vSearchQuery = { "title": vSearchRegex }
-    }
-    
-    
 
     /*
     console.log("\n\nvSkip = " + vSkip)
     console.log("vLimit = " + vLimit)
     console.log("vPage = " + vPage)
+    console.log("sort object = " + sortObj)
     console.log("vSearchStr = " + vSearchStr)
     console.log("\n\n")
     */
 
- 
     
-
 
     Book.find(vSearchQuery, {"title":1, "author":1})
     .populate('author')
     .sort(sortObj)
     .limit(vLimit).skip(vSkip).lean()
-    
     .exec(function (err, list_books) {
       if (err) { return next(err); }
       //Successful, so render
@@ -119,8 +171,7 @@ function(req, res, next) {
         const itemCount = bookCount;
         console.log("\n\nbook_list: itemCount = " + itemCount + "; vLimit =" + vLimit)
         const pageCount = Math.ceil(itemCount / vLimit);
-        //res.render('book_list', { title: 'Book List', book_list: list_books, currentPage: vPage, pageCount, itemCount, arrow:arrow, sortOrder:order, pages: paginate.getArrayPages(req)(50, pageCount, req.query.page) });
-        res.render('book_list', { title: 'Book List', book_list: list_books, currentPage: vPage, pageCount, itemCount, itemsOnPage:vLimit, arrow:arrow, sortOrder:order, searchString:vSearchStr });
+        res.render('BACKUP_book_list', { title: 'BACKUP Book List', book_list: list_books, currentPage: vPage, pageCount, itemCount, itemsOnPage:vLimit, arrow:arrow, sortOrder:order, searchString:vSearchStr });
         
         })
     });
@@ -417,6 +468,7 @@ exports.book_update_get = function(req, res, next) {
     async.parallel({
         authors: function(callback) {
             Author.find(callback);
+            //Author.find({}).exec(callback);  // also works
         },
 
         genres: function(callback) {

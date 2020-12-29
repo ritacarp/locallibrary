@@ -11,6 +11,7 @@ var book_instance_controller = require('../controllers/bookinstanceController');
 
 const authorsValidator = require("../middleware/validators/authorValidator");
 const booksValidator = require("../middleware/validators/bookValidator");
+const bookInstanceValidator = require("../middleware/validators/bookInstanceValidator");
 
 /// BOOK ROUTES ///
 
@@ -97,10 +98,10 @@ router.get('/genres', genre_controller.genre_list);
 /// BOOKINSTANCE ROUTES ///
 
 // GET request for creating a BookInstance. NOTE This must come before route that displays BookInstance (uses id).
-router.get('/bookinstance/create', book_instance_controller.bookinstance_create_get);
+router.get('/bookinstance/:bookID/create', book_instance_controller.bookinstance_create_get);
 
 // POST request for creating BookInstance. 
-router.post('/bookinstance/create', book_instance_controller.bookinstance_create_post);
+router.post('/bookinstance/:bookID/create', bookInstanceValidator.validateBookInstanceForm, book_instance_controller.bookinstance_create_post);
 
 // GET request to delete BookInstance.
 router.get('/bookinstance/:id/delete', book_instance_controller.bookinstance_delete_get);
@@ -112,7 +113,7 @@ router.post('/bookinstance/:id/delete', book_instance_controller.bookinstance_de
 router.get('/bookinstance/:id/update', book_instance_controller.bookinstance_update_get);
 
 // POST request to update BookInstance.
-router.post('/bookinstance/:id/update', book_instance_controller.bookinstance_update_post);
+router.post('/bookinstance/:id/update', bookInstanceValidator.validateBookInstanceForm, book_instance_controller.bookinstance_update_post);
 
 // GET request for one BookInstance.
 router.get('/bookinstance/:id', book_instance_controller.bookinstance_detail);

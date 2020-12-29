@@ -16,12 +16,14 @@ block content
   p #[strong ISBN:] #{book.isbn}
   p #[strong Genre:] 
     each val, index in book.genre
-      a(href=val.url) #{val.name}
+      a(href=val.url) #{val.decodedName}
       if index < book.genre.length - 1
         |, 
   
   div(style='margin-left:20px;margin-top:20px')
-    h4 Copies
+    h4 Copies 
+      span &nbsp;&nbsp;
+      button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/create" data-ID=book._id) Create Book Copy
     
     each val in book_instances
       hr

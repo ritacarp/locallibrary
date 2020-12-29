@@ -1,0 +1,96 @@
+const aggregate = Author.aggregate(
+
+
+[
+  {
+    '$match': {
+      'family_name': new RegExp('ov', 'i')
+    }
+  }, {
+    '$lookup': {
+      'from': 'books', 
+      'localField': '_id', 
+      'foreignField': 'author', 
+      'as': 'books'
+    }
+  }, {
+    '$lookup': {
+      'from': 'bookinstances', 
+      'localField': 'books._id', 
+      'foreignField': 'book', 
+      'as': 'allCopies'
+    }
+  }, {
+    '$project': {
+      '_id': 1, 
+      'first_name': 1, 
+      'family_name': 1, 
+      'allCopies': 1, 
+      'books': 1
+    }
+  }, {
+    '$lookup': {
+      'from': 'bookinstances', 
+      'let': {
+        'book': '$books', 
+        'book_status': 'Available'
+      }, 
+      'pipeline': [
+        {
+          '$match': {
+            '$expr': {
+              '$and': 
+              [
+                {'$in': ['$book', '$$book._id']}, 
+                {'$eq': ['$status', '$$book_status']}
+                //{ $regexFind: { input: "$status", regex: /available/i }  }
+              ]
+            }
+          }
+        }
+      ], 
+      'as': 'availableCopies'
+    }
+  }, {
+    '$project': {
+      '_id': 1, 
+      'first_name': 1, 
+      'family_name': 1, 
+      'numberOfCopies': {
+        '$cond': {
+          'if': {
+            '$isArray': '$allCopies'
+          }, 
+          'then': {
+            '$size': '$allCopies'
+          }, 
+          'else': 'NA'
+        }
+      }, 
+      'numberOfAvailableCopies': {
+        '$cond': {
+          'if': {
+            '$isArray': '$availableCopies'
+          }, 
+          'then': {
+            '$size': '$availableCopies'
+          }, 
+          'else': 'NA'
+        }
+      }
+    }
+  }, {
+    '$sort': {
+      'family_name': -1
+    }
+  }
+]
+
+)
+
+---------------------------------------------------------
+
+
+
+  
+ { $regexMatch: { input: '$status' , regex: /available/, options: i } },

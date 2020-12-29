@@ -23,12 +23,13 @@ block content
   table(style='width:90%'  class="table table-hover table-sm")
     thead(class="thead-dark")
       tr
-        th(width="35%") Name 
+        th(width="42%") Name 
           a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/authors/" data-col="family_name,first_name" data-sortOrder=vSortOrder)
             i(class=vClass)
 
-        th(width="25%") Books By Author Count
-        th(width="25%") Available Copy Count
+        th(width="20%") Date of Birth
+        th(width="20%") Date of Death
+        th Age
         th 
           <a href="/catalog/author/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
       
@@ -38,23 +39,15 @@ block content
             td 
               -var authorURL= "/catalog/author/" + author._id
               a(href=authorURL) #{author.first_name} #{author.family_name}
-
-            td #{author.numberOfBooks}
-
-            td #{author.numberOfAvailableCopies}
-
-
-            //-
-              if author.date_of_birth!=null  
-                td #{moment(author.date_of_birth).format('LL')}
-              else
-                td &nbsp;
-              if author.date_of_death!=null
-                td #{moment(author.date_of_death).format('LL')}
-              else
-                td &nbsp;
-              td #{author.lifespan}
-
+            if author.date_of_birth!=null  
+              td #{moment(author.date_of_birth).format('LL')}
+            else
+              td &nbsp;
+            if author.date_of_death!=null
+              td #{moment(author.date_of_death).format('LL')}
+            else
+              td &nbsp;
+            td #{author.lifespan}
             td 
               //-
                 button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="" data-ID=author._id) View
