@@ -4,14 +4,14 @@ heroku git:clone -a nodejs-express-library
 git add app.js
 git add authorAggregation.txt
 git add bookAggregation.txt
-git add bookAggregation_01.txt.txt
+git add bookAggregation_01.txt
 git add bookAuthorToArray.js
 git add bookInstanceAggregation.txt
 git add genreAggregation.txt
 git add package.json
 git add package-lock.json
 git add populatedb.js
-git add PushToHeroku.txt
+git add PushToHeroku.txt -f
 git add simple.js
 git add StartApp.txt
 git add testCallback.js

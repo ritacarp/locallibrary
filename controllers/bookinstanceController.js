@@ -275,10 +275,10 @@ exports.bookinstance_detail =  function(req, res) {
     
     BookInstance.findById(req.params.id)
     .populate('book')
-    .exec(function (err, aBookinstance) {
+    .exec(function (err, bookinstance) {
         if (err) { return next(err); }
         //Successful, so render
-        res.render('bookinstance_detail', { instance: aBookinstance } );
+        res.render('bookinstance_detail', { instance: bookinstance } );
       });
 }
 
@@ -306,8 +306,8 @@ exports.bookinstance_create_get = function(req, res, next) {
         thisStatus=defautStatus
 
 
-        aBookinstance = null
-        res.render('bookinstance_form', { title: 'Create Book Copy',  instance: aBookinstance, book:book, statusEnums:statusEnums, thisStatus:thisStatus } );
+        bookinstance = null
+        res.render('bookinstance_form', { title: 'Create Book Copy',  bookinstance: bookinstance, book:book, statusEnums:statusEnums, thisStatus:thisStatus } );
 
       })
 
@@ -339,9 +339,9 @@ exports.bookinstance_create_post = function(req, res) {
 
         thisStatus=defautStatus
         if (req.body.status) thisStatus=req.body.status
-        aBookinstance = null
+        bookinstance = null
 
-        var aBookinstance = new BookInstance(
+        var bookinstance = new BookInstance(
           { book: req.params.bookID,
             imprint: req.body.imprint,
             status: req.body.status,
@@ -353,10 +353,16 @@ exports.bookinstance_create_post = function(req, res) {
         if (!errors.isEmpty()) {
           // There are errors. Render form again with sanitized values/error messages.
           //res.render('book_form', { title: 'Create Book',authors:results.authors, genres:results.genres, book: book, errors: errors.array(), authorIDs:authorIDs, genreIDs:genreIDs  } );
-          res.render('bookinstance_form', { title: 'Create Book Copy',  instance: aBookinstance, book:book, errors: errors.array(), statusEnums:statusEnums, thisStatus:thisStatus } );
+          res.render('bookinstance_form', { title: 'Create Book Copy',  bookinstance: bookinstance, book:book, errors: errors.array(), statusEnums:statusEnums, thisStatus:thisStatus } );
         } else {
-          console.log("there were no errors")
-          res.end("Done")
+          console.log("\n\nthere were no errors the book Instance:")
+          console.log(JSON.stringify(bookinstance))
+          bookinstance.save(function (err) {
+            if (err) { return next(err); }
+            // Author saved. Redirect to Author detail page.
+            res.redirect(bookinstance.url);
+          });
+
         }
 
       })
@@ -364,22 +370,119 @@ exports.bookinstance_create_post = function(req, res) {
 
 };
 
-// Display BookInstance delete form on GET.
-exports.bookinstance_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance delete GET');
-};
 
-// Handle BookInstance delete on POST.
-exports.bookinstance_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance delete POST');
-};
 
 // Display BookInstance update form on GET.
-exports.bookinstance_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update GET');
+exports.bookinstance_update_get = function(req, res,next) {
+    //res.send('NOT IMPLEMENTED: BookInstance update GET');
+    BookInstance.findById(req.params.id)
+    .exec(function (err, bookinstance) {
+        if (err) { 
+            console.log("Edit Book Instance: GET - could not find book instance by id " + req.params.id + "\n")
+            return next(err); 
+        }
+        //Successful, so render
+        if (!bookinstance) {
+            res.redirect("catalog/books")
+        }
+        else {
+          
+          var model = new mongoose.model('BookInstance')();
+          statusEnums = model.schema.path('status').enumValues
+          defautStatus = model.schema.path('status').defaultValue
+          console.log("status enums = " + statusEnums + " default = " + defautStatus)
+  
+          thisStatus=bookinstance.status
+          if (!thisStatus) {thisStatus = defautStatus}
+
+          var bookID = bookinstance.book
+
+          Book.findById(bookID)
+          .exec(function (err, book) {
+            if (err) { 
+              console.log("bookinstance_update_get: UPDATE GET - could not find book by by id " + bookID + "\n")
+              return next(err); 
+          }
+            //Successful, so render
+            if (!book) {
+              res.redirect("/catalog/book/create")
+            }
+            else {
+              res.render('bookinstance_form', { title: 'Update Book Copy',  bookinstance: bookinstance, book:book, statusEnums:statusEnums, thisStatus:thisStatus } );
+            }
+          })
+
+
+        }
+
+      })
+
 };
 
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update POST');
+exports.bookinstance_update_post = function(req, res, next) {
+    //res.send('NOT IMPLEMENTED: BookInstance update POST');
+
+
+    var bookinstance = new BookInstance(
+      { book: req.body.bookID,
+        imprint: req.body.imprint,
+        status: req.body.status,
+        due_back: req.body.due_back,
+        _id:req.params.id
+      });
+
+    
+    Book.findById(req.body.bookID)
+    .exec(function (err, book) {
+          if (err) { 
+            console.log("bookinstance_update_Post: POST - could not find book by by id " + req.params.bookid + "\n")
+            return next(err); 
+          }
+
+          console.log("1) in book instance UPDATE POST - the book is " + JSON.stringify(book))
+
+          var model = new mongoose.model('BookInstance')();
+          statusEnums = model.schema.path('status').enumValues
+          defautStatus = model.schema.path('status').defaultValue
+      
+          var thisStatus=defautStatus
+          if (req.body.status) thisStatus=req.body.status
+      
+          const errors = validationResult(req);
+
+          console.log("\n\nin book instance UPDATE POST - back from validating")
+
+          if (!errors.isEmpty()) {
+            console.log("\n\nin book instance UPDATE POST - validation errors, redireting to book instance form")
+            console.log("2) in book instance UPDATE POST - the book is " + JSON.stringify(book))
+            res.render('bookinstance_form', { title: 'Update Book Copy',  bookinstance: bookinstance, book:book, errors: errors.array(), statusEnums:statusEnums, thisStatus:thisStatus } );
+         } else {
+          BookInstance.findByIdAndUpdate(req.params.id, bookinstance, {}, function (err,updatedInstance) {
+            if (err) { return next(err); }
+            res.redirect(updatedInstance.url);
+          })
+         }
+
+    })
+
+
+ 
+ 
+
+
+
+ 
+
+};
+
+
+// Display BookInstance delete form on GET.
+exports.bookinstance_delete_get = function(req, res) {
+  res.send('NOT IMPLEMENTED: BookInstance delete GET');
+};
+
+// Handle BookInstance delete on POST.
+exports.bookinstance_delete_post = function(req, res, next) {
+  res.send('NOT IMPLEMENTED: BookInstance delete POST');
 };

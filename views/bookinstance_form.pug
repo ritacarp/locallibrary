@@ -5,8 +5,8 @@ block content
     h2 #{title}
 
     form#bookInstance_form(method='POST' action='')
-        input#_id(type='hidden' name='_id' value=(undefined===book ? '' : book._id))
-        input#_id(type='hidden' name='_id' value=(undefined===bookinstance ? '' : bookinstance._id))
+        input#bookID(type='hidden' name='bookID' value=(undefined===book ? '' : book._id))
+        input#_id(type='hidden' name='_id' value=(undefined===bookinstance || bookinstance==null ? '' : bookinstance._id))
 
         div.form-group
             label #[strong Title:] 
@@ -15,7 +15,7 @@ block content
 
         div.form-group
             label(for='imprint') #[strong Imprint:] 
-            input#imprint.form-control(type='text', placeholder='' name='imprint' value=(undefined===bookinstance ? '' : bookinstance.decodedImprint))
+            input#imprint.form-control(type='text', placeholder='' name='imprint' value=(undefined===bookinstance || bookinstance==null  ? '' : bookinstance.decodedImprint))
         
         div.form-group
             label #[strong Status:]&nbsp;&nbsp;
@@ -30,7 +30,7 @@ block content
         div#dueBackDiv.form-group
             label(for='due_back') #[strong Due Back:]
             div(class="input-group date"  id="due_back_dp")
-                input#due_back(type='text' class="form-control dp" name='due_back' value=(undefined===bookinstance ? '' : bookinstance.due_back_short))
+                input#due_back(type='text' class="form-control dp" name='due_back' value=(undefined===bookinstance || bookinstance==null  ? '' : bookinstance.due_back_short))
                 span(class="input-group-addon  input-group-append")
                     div(class="input-group-text")
                         i(class="glyphicon glyphicon-calendar fa fa-calendar")

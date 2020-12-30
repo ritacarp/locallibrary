@@ -2,7 +2,10 @@ extends layout
 
 block content
 
-    h2 ID: #{instance._id}
+    h2 
+      span ID: #{instance._id}
+      span &nbsp;&nbsp;
+      button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/update" data-ID=instance._id) Edit
     
     p <span style="font-weight:bold">Title: </span> 
         a(href=instance.book.url) #{instance.book.title}
@@ -20,3 +23,5 @@ block content
     p
         if instance.status!='Available'
           <span style="font-weight:bold">Due back: </span> #{instance.due_back_formatted}
+
+    script(type="text/javascript" src="/javascripts/authorList.js")

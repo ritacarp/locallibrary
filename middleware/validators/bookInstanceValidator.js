@@ -10,7 +10,7 @@ exports.validateBookInstanceForm = [
             console.log("Imprint must not be blank.")
             return Promise.reject('Imprint must not be blank.');
         } else {
-            var RegEx = /^[[A-Za-z0-9 ,.]+$/i; 
+            var RegEx = /^[[A-Za-z0-9 ,. &()]+$/i; 
             var isValid = RegEx.test(vImprint); 
             if (!isValid) {
                 console.log("\n\nbook instance validator: vImprint = " + vImprint + "\n\n")
@@ -22,6 +22,10 @@ exports.validateBookInstanceForm = [
     }),
 
     body('due_date').custom((value, { req }) => {
+        var mm
+        var dd
+        var yyyy
+
         let vStatus = req.body.status.trim()
         let vSourceDate =  req.body.due_back
         //if (vSourceDate) vSourceDate.trim()
@@ -36,16 +40,26 @@ exports.validateBookInstanceForm = [
             }
             else {  
                 try {
-                    dueBackDate = DateTime.fromFormat(vSourceDate, 'MM/dd/yyyy')
-                    dueBackDateISODate = dueBackDate.toISODate()
+                    var vDateArray = vSourceDate.split("/");
+                    mm = vDateArray[0].padStart(2, '0'); //January is 0!
+                    dd = vDateArray[1].padStart(2, '0'); //January is 0!
+                    yyyy = vDateArray[2]
+                    var dueBackDateISODate = yyyy + "-" + mm + '-' + dd ;
+                    //dueBackDate = DateTime.fromFormat(vSourceDate, 'MM/dd/yyyy')
+                    //console.log("This is 1")
+                    //dueBackDateISODate = vSourceDate.toISODate()
+                    console.log("This is 2")
                     
                     var today = new Date();
-                    var dd = String(today.getDate()).padStart(2, '0');
-                    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-                    var yyyy = today.getFullYear();
+                    dd = String(today.getDate()).padStart(2, '0');
+                    mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    yyyy = today.getFullYear();
                     todayISODate = yyyy + "-" + mm + '-' + dd ;
 
+                    console.log("\n\n1)" + dueBackDateISODate + " > " + todayISODate)
+
                     if ( dueBackDateISODate > todayISODate) {
+                        console.log("\n\n2)" + dueBackDateISODate + " > " + todayISODate)
                         return Promise.resolve
                     } else {
                         return Promise.reject('Invalid Due Back Date ' + vSourceDate + "; Due Back Date must be in the future")

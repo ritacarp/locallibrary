@@ -27,12 +27,13 @@ block content
   table(border='0' style='width:90%;'  class="table table-hover table-sm")
     thead(class="thead-dark")
       tr
-        th(width="50%") Title 
+        th(width="40%") Title 
           a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/books/" data-col="title" data-sortOrder=vSortOrder)
             i(class=vClass)
         th(width="20%") Author
         th Copies
-        th
+        th Available
+        th(width="24%")
           <a href="/catalog/book/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
           
 
@@ -51,7 +52,9 @@ block content
                   |<br>
 
           td
-            a(href=bookURL) #{book.copyCount}
+            a(href=bookURL) #{book.numberOfCopies}
+          td
+            a(href=bookURL) #{book.numberOfAvailableCopies}
           td
             button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/book/" data-action="/update" data-ID=book._id) Edit Book
             span &nbsp;&nbsp;

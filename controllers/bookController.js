@@ -65,23 +65,52 @@ async function(req, res, next) {
           }
     } // authorLookupStage
 
-    var copyLookupStage =  {
+    var allCopiesLookupStage =  {
         '$lookup': {
             'from': 'bookinstances', 
             'localField': '_id', 
             'foreignField': 'book', 
-            'as': 'copies'
+            'as': 'allCopies'
           }
-    } // copyLookupStage
+    } // allCopiesLookupStage
+
+    var availableCopiesLookupStage =  {
+        '$lookup': {
+            'from': 'bookinstances', 
+            'let': {
+              'bookID': '$_id', 
+              'book_status': 'Available'
+            }, 
+            'pipeline': [
+              {
+                '$match': {
+                  '$expr': {
+                    '$and': [
+                      {
+                        '$eq': [
+                          '$$bookID', '$book'
+                        ]
+                      }, {
+                        '$eq': [
+                          '$status', '$$book_status'
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ], 
+            'as': 'availableCopies'
+          }
+    }  // availableCopiesLookupStage
 
     var projectStage = {
         '$project': {
             '_id': 1, 
             'title': 1, 
             'authors': 1, 
-            'copyCount': {
-              '$size': '$copies'
-            }
+            'numberOfCopies': { '$cond': { 'if': { '$isArray': '$allCopies'}, 'then': {'$size': '$allCopies' }, 'else': 'NA'} }, 
+            'numberOfAvailableCopies': { '$cond': { 'if': {'$isArray': '$availableCopies'}, 'then': {'$size': '$availableCopies' },  'else': 'NA'} }
           }
     } // projectStage
 
@@ -95,7 +124,8 @@ async function(req, res, next) {
     queryPipeline.push(matchStage)
     }
     queryPipeline.push(authorLookupStage)
-    queryPipeline.push(copyLookupStage)
+    queryPipeline.push(allCopiesLookupStage)
+    queryPipeline.push(availableCopiesLookupStage)
     queryPipeline.push(projectStage)
     queryPipeline.push(sortStage)
 
@@ -104,7 +134,8 @@ async function(req, res, next) {
       countingPipeline.push(matchStage)
     }
     countingPipeline.push(authorLookupStage)
-    countingPipeline.push(copyLookupStage)
+    countingPipeline.push(allCopiesLookupStage)
+    countingPipeline.push(availableCopiesLookupStage)
     countingPipeline.push(projectStage)
     countingPipeline.push(sortStage)
     countingPipeline.push({ $count: "count" })
