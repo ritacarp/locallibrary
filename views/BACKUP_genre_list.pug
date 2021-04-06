@@ -10,7 +10,8 @@ block content
         thead(class="thead-dark")
             tr
                 th(width="28%") Genre
-                th(width="60%") Title / Author
+                th(width="45%") Title / Author
+                th(width="15%") Book Count
                 th(width="12%") 
                     <a href="/catalog/genre/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
 
@@ -37,6 +38,9 @@ block content
                                         a(href=oneBook.author.url) (#{oneBook.author.name})
                             else
                                 div There are no books in this genre
+                        
+                        td #{oneGenre.bookCount}
+                        
                         td
                             button(type="button" class="btn btn-outline-primary btn-sm action" data-ID=oneGenre.genre.name, data-route="/catalog/genre/" data-action="/update" ) Edit Genre
                 else

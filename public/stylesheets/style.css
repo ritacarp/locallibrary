@@ -1,55 +1,52 @@
 .sidebar-nav {
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
 }
 
 .popover {
-    min-width: 500px;
-  }
-
-.popover-header {
-    color:white;
-    background-color: #343a40;
+  min-width: 500px;
 }
 
-
+.popover-header {
+  color: white;
+  background-color: #343a40;
+}
 
 .navbar {
-font-weight: 400;
-line-height: 1.50;
-color: #212529;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
 
-text-align: left;
-font-family: sans-serif;
-font-size: 15px;
-box-sizing: border-box;
-position: relative;
-display: flex;
-flex-wrap: wrap;
-align-items: center;
-justify-content: space-between;
-padding: .5rem 1rem;
+  text-align: left;
+  font-family: sans-serif;
+  font-size: 15px;
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
 
-background-color: rgb(248, 249, 250)!important;
-border: 1px solid rgb(222, 226, 230)!important;
+  background-color: rgb(248, 249, 250) !important;
+  border: 1px solid rgb(222, 226, 230) !important;
 }
 
 .bg-light {
-    background-color: #f8f9fa!important;
+  background-color: #f8f9fa !important;
 }
 
 .navbar-light .navbar-brand {
-    color: rgba(0,0,0,.9);
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .navbar-brand {
-    display: inline-block;
-    padding-top: .3125rem;
-    padding-bottom: .3125rem;
-    margin-right: 1rem;
-    font-size: 1.25rem;
-    line-height: inherit;
-    white-space: nowrap;
+  display: inline-block;
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem;
+  font-size: 1.25rem;
+  line-height: inherit;
+  white-space: nowrap;
 }
-

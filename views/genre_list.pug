@@ -22,11 +22,12 @@ block content
     table(style='width:90%'  class="table table-hover table-sm")
         thead(class="thead-dark")
             tr
-                th(width="45%") Genre 
+                th(width="30%") Genre 
                     a(href="javascript:void(0)" class="paging" id="paging" data-route="/catalog/genres/" data-col="name" data-sortOrder=vSortOrder)
                         i(class=vClass)
 
-                th(width="35%") Number of Book Copies
+                th(width="25%") Books In Genre Count
+                th(width="25%") Available Count
                 th(width="20%") 
                     <a href="/catalog/genre/create"><img style="float: right; padding-right:35px;" src="/images/circlePlusSign.png"></a>
 
@@ -39,7 +40,10 @@ block content
                             a(href=genreURL) #{he.decode(oneGenre.name)}
                          
                         td(style="padding-left:50px")
-                            a(href=genreURL) #{oneGenre.copyCount}
+                            a(href=genreURL) #{oneGenre.numberOfCopies}
+                        
+                        td(style="padding-left:50px")
+                            a(href=genreURL) #{oneGenre.numberOfAvailableCopies}
 
                            
                             //-

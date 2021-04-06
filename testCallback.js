@@ -1,5 +1,7 @@
 var async = require('async');
 
+function done(error, val){ console.log("done: the returned value is " + val)}
+
 async.parallel([
     function(callbackOne) {
         setTimeout(function() {
@@ -12,12 +14,34 @@ async.parallel([
         }, 100);
     }
 ],
+
 // optional callback
+/*
 function(err, results) {
     // the results array will equal ['one','two'] even though
     // the second function had a shorter timeout.
     console.log(results)
-});
+}
+*/
+
+/*
+someFunction(null)
+);
+*/
+
+/*
+function done(err, results) {
+        if (err) {
+            throw err;
+        }
+        console.log("done !! " + results)
+    });
+*/
+
+function(err, results) {
+ done(err,results) }
+);
+
 
 
 
@@ -37,3 +61,4 @@ async.parallel({
     // results is now equals to: {one: 1, two: 2}
     console.log(results)
 });
+

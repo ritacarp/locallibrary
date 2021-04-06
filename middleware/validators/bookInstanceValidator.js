@@ -45,10 +45,6 @@ exports.validateBookInstanceForm = [
                     dd = vDateArray[1].padStart(2, '0'); //January is 0!
                     yyyy = vDateArray[2]
                     var dueBackDateISODate = yyyy + "-" + mm + '-' + dd ;
-                    //dueBackDate = DateTime.fromFormat(vSourceDate, 'MM/dd/yyyy')
-                    //console.log("This is 1")
-                    //dueBackDateISODate = vSourceDate.toISODate()
-                    console.log("This is 2")
                     
                     var today = new Date();
                     dd = String(today.getDate()).padStart(2, '0');
@@ -56,10 +52,7 @@ exports.validateBookInstanceForm = [
                     yyyy = today.getFullYear();
                     todayISODate = yyyy + "-" + mm + '-' + dd ;
 
-                    console.log("\n\n1)" + dueBackDateISODate + " > " + todayISODate)
-
                     if ( dueBackDateISODate > todayISODate) {
-                        console.log("\n\n2)" + dueBackDateISODate + " > " + todayISODate)
                         return Promise.resolve
                     } else {
                         return Promise.reject('Invalid Due Back Date ' + vSourceDate + "; Due Back Date must be in the future")

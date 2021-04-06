@@ -4,21 +4,28 @@ let docs = await Book.aggregate(
     '$match': {
       'title': new RegExp('death', 'i')
     }
-  }, {
+  }, 
+  
+  {
     '$lookup': {
       'from': 'authors', 
       'localField': 'author', 
       'foreignField': '_id', 
       'as': 'authors'
     }
-  }, {
+  }, 
+  
+  {
     '$lookup': {
       'from': 'bookinstances', 
       'localField': '_id', 
       'foreignField': 'book', 
       'as': 'copies'
     }
-  }, {
+  }, 
+  
+  
+  {
     '$project': {
       '_id': 1, 
       'title': 1, 
