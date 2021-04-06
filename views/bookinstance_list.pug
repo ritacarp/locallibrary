@@ -69,7 +69,11 @@ block content
             td
               button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/bookinstance/" data-action="/update" data-ID=instance._id) Edit Book Copy
         else
-          span No books copies available
+          tr
+            if searchString != ""
+              td(colspan=2) There are no book copies matching your search of #{searchString}.
+            else
+              td No book copies available
 
   table(border="0", width="90%")
     tr

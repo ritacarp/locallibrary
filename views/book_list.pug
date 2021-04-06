@@ -62,7 +62,9 @@ block content
 
       else
          tr 
-           td
+          if searchString != ""
+            td(colspan=2) There are no books matching your search of #{searchString}.
+          else
             span There are no books.
   
   

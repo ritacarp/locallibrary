@@ -65,7 +65,10 @@ block content
                             button(type="button" class="btn btn-outline-primary btn-sm action" data-ID=oneGenre._id, data-route="/catalog/genre/" data-action="/update" ) Edit Genre
                 else
                     tr
-                        td There are no genres
+                        if searchString != ""
+                            td(colspan=2) There are no genres matching your search of #{searchString}.
+                        else
+                            td There are no genres
 
 
     table(border="0", width="90%")

@@ -125,11 +125,20 @@ exports.genre_list = async function (req, res, next) {
   countingPipeline.push(sortStage);
   countingPipeline.push({ $count: "count" });
 
+  let itemCount = 0;
+  let pageCount = 0;
+
   try {
     const list_genres = await Genre.aggregate(queryPipeline);
     const instanceCount = await Genre.aggregate(countingPipeline);
-    var itemCount = instanceCount[0]["count"];
-    const pageCount = Math.ceil(itemCount / vLimit);
+
+    try {
+      itemCount = instanceCount[0]["count"];
+      pageCount = Math.ceil(itemCount / vLimit);
+    } catch (err) {
+      itemCount = 0;
+      pageCount = 0;
+    }
 
     var lower = vSkip;
     var upper = vSkip + vLimit;

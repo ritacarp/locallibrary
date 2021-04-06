@@ -62,7 +62,10 @@ block content
               button(type="button" class="btn btn-outline-primary btn-sm action" data-route="/catalog/author/" data-action="/update" data-ID=author._id) Edit Author
         else
           tr
-            td There are no authors.
+            if searchString != ""
+              td(colspan=2) There are no authors matching your search of #{searchString}.
+            else
+              td There are no authors.
 
   table(border="0", width="90%")
     tr
